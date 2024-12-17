@@ -1,9 +1,9 @@
 import WaitlistComponent from '@/components/WaitlistComponent';
 
 export const metadata = {
-  title: 'OmniStack - Join our Waitlist',
-  description: 'Join our decentralized all-in-one community platform waitlist and be the first to experience our powerful features.',
-  keywords: ['community platform', 'waitlist', 'decentralized platform', 'OmniStack'],
+  title: 'VisionTrack - Join the Enterprise Video Intelligence Waitlist',
+  description: 'Be among the first to transform your video surveillance into actionable business intelligence with VisionTrack\'s enterprise platform.',
+  keywords: ['video intelligence', 'enterprise surveillance', 'business intelligence', 'AI analytics', 'security solutions', 'VisionTrack'],
 };
 
 export default function WaitlistPage() {
