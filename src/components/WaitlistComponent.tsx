@@ -1,6 +1,8 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
+import Image from "next/image";
+import Link from "next/link";
 
 type ViewState = 'join' | 'check' | 'success';
 
@@ -9,6 +11,7 @@ interface SuccessData {
   totalCount: number;
   referralLink: string;
 }
+
 
 const features = [
   {
@@ -49,6 +52,16 @@ export default function WaitlistComponent() {
     localStorage.setItem('theme', newTheme);
     document.documentElement.classList.toggle('dark');
   };
+
+  const [stickyMenu, setStickyMenu] = useState(false);
+
+useEffect(() => {
+  const handleScroll = () => {
+    setStickyMenu(window.scrollY > 0);
+  };
+  window.addEventListener("scroll", handleScroll);
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -262,25 +275,32 @@ export default function WaitlistComponent() {
   );
 
   return (
-    <div className={`min-h-screen antialiased font-manrope ${theme === 'dark' ? 'dark bg-gray-900' : 'bg-white'}`}>
-      {/* Navigation */}
-      <nav className="flex items-center justify-between px-6 py-4">
-        <div className="flex items-center space-x-1">
-          <a href="/" className="text-sm font-normal text-[#6B7280] dark:text-gray-400">Boilerplate</a>
-          <span className="text-[#6B7280] dark:text-gray-400">/</span>
-          <a href="/careers" className="text-sm font-normal text-[#6B7280] dark:text-gray-400">Waitlist</a>
+    <div className={`min-h-screen antialiased font-manrope flex flex-col ${theme === 'dark' ? 'dark bg-gray-900' : 'bg-white'}`}>
+       {/* Header */}
+    <header className={`fixed left-0 top-0 z-999 w-full transition-all duration-300 ease-in-out ${
+      stickyMenu ? "bg-white dark:bg-gray-900 py-4 shadow-md xl:py-0" : "bg-white dark:bg-gray-900 py-4 shadow-md xl:py-0"
+    }`}>
+      <div className="relative mx-auto max-w-[1170px] items-center justify-between px-4 sm:px-8 xl:flex xl:px-0">
+        <div className="flex w-full items-center justify-between xl:w-4/12">
+          <Link href="/">
+            <Image
+              src={theme === 'dark' ? "/images/logo/logo-light.svg" : "/images/logo/logo.svg"}
+              alt="VisionTrack"
+              width={150}
+              height={40}
+              className="w-full"
+            />
+          </Link>
         </div>
-        <div className="flex items-center">
-          <span className="text-[#6B7280] dark:text-gray-400 mr-1">@</span>
-          <span className="text-[#111827] dark:text-white">OmniStack.</span>
-        </div>
-        <button
-          onClick={toggleTheme}
-          className="inline-flex items-center px-3 py-1.5 text-sm text-[#6B7280] dark:text-gray-400 bg-[#F9FAFB] dark:bg-gray-800 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-        >
-          {theme === 'light' ? (
-            <>
-              <svg className="mr-1.5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+        <div className="flex items-center space-x-8">
+      
+          <button
+            onClick={toggleTheme}
+            className="p-4 text-[#6B7280] dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+          >
+            {theme === 'dark' ? (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="5"/>
                 <line x1="12" y1="1" x2="12" y2="3"/>
                 <line x1="12" y1="21" x2="12" y2="23"/>
@@ -291,20 +311,19 @@ export default function WaitlistComponent() {
                 <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
                 <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
               </svg>
-              Light
-            </>
-          ) : (
-            <>
-              <svg className="mr-1.5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
               </svg>
-              Dark
-            </>
-          )}
-        </button>
-      </nav>
+            )}
+          </button>
+        </div>
+      </div>
+    </header>
+
   
-      <main className="max-w-[1200px] mx-auto px-8 py-12">
+     {/* Main content */}
+    <main className="max-w-[1200px] mx-auto px-8 py-12 pt-24"> {/* Added pt-24 for header space */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
           {/* Left Column - Always visible */}
           <div className="space-y-12">
@@ -386,6 +405,20 @@ export default function WaitlistComponent() {
           </div>
         </div>
       </main>
+      {/* Footer */}
+    <footer className="border-t dark:border-gray-800 py-8 mt-auto">
+      <div className="max-w-[1170px] mx-auto px-4 sm:px-8 xl:px-0 flex items-center justify-between">
+        <Image
+          src={theme === 'dark' ? "/images/logo/logo-light.svg" : "/images/logo/logo.svg"}
+          alt="VisionTrack"
+          width={250}
+          height={130}
+        />
+        <div className="text-sm text-[#6B7280] dark:text-gray-400">
+          © {new Date().getFullYear()} VisionTrack. All rights reserved.
+        </div>
+      </div>
+    </footer>
     </div>
   );
 }
