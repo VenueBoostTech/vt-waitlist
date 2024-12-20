@@ -27,6 +27,8 @@ model Client {
   updatedAt      DateTime         @updatedAt
   waitlists      Waitlist[]      
   billingHistory BillingHistory[] 
+  supabaseId     String          @unique  // Link to Supabase user
+  platforms      String[]         // Which platforms they use
 }
 
 model BillingHistory {
