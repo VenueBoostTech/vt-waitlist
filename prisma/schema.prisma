@@ -1,0 +1,111 @@
+// prisma/schema.prisma
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum SubscriptionTier {
+  FREE
+  ADVANCED
+  PRO
+}
+
+model Client {
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  email          String           @unique
+  password       String
+  subscription   SubscriptionTier @default(FREE)
+  companyName    String?
+  phone          String?
+  address        String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  waitlists      Waitlist[]      
+  billingHistory BillingHistory[] 
+}
+
+model BillingHistory {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  client    Client   @relation(fields: [clientId], references: [id])
+  clientId  String   @db.ObjectId
+  amount    Float
+  currency  String   @default("USD")
+  status    String   
+  plan      SubscriptionTier
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Waitlist {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  templateId    Int             
+  domain        String?         
+  subdomain     String?         
+  slug          String          
+  customization Json?           
+  status        String          @default("active") 
+  settings      Json?           
+  client        Client          @relation(fields: [clientId], references: [id])
+  clientId      String          @db.ObjectId
+  entries       WaitlistEntry[]
+  analytics     Analytics?      
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@unique([subdomain])
+  @@unique([domain])
+  @@unique([slug])
+}
+
+model WaitlistEntry {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  email          String
+  phone          String?
+  referralCode   String    
+  position       Int       
+  referralSource String?   
+  referredBy     String?   @db.ObjectId 
+  customData     Json?     
+  status         String    @default("active") 
+  waitlist       Waitlist  @relation(fields: [waitlistId], references: [id])
+  waitlistId     String    @db.ObjectId
+  metadata       Json?     
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([email, waitlistId])
+  @@unique([referralCode])
+  @@index([waitlistId])
+}
+
+model Analytics {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  waitlist    Waitlist @relation(fields: [waitlistId], references: [id])
+  waitlistId  String   @db.ObjectId @unique
+  views       Int      @default(0)
+  signups     Int      @default(0)
+  conversions Int      @default(0)
+  referrals   Int      @default(0)
+  dailyStats  Json?    
+  utmData     Json?    
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Template {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  thumbnail   String?  
+  config      Json     
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

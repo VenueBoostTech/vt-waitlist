@@ -28,7 +28,7 @@ const features = [
   }
 ];
 
-export default function WaitlistComponent() {
+export default function WaitlistComponentTemplateThree() {
   const [theme, setTheme] = useState('light');
   const [viewState, setViewState] = useState<ViewState>('join');
   const [loading, setLoading] = useState(false);
@@ -63,57 +63,74 @@ useEffect(() => {
   return () => window.removeEventListener("scroll", handleScroll);
 }, []);
 
-  const handleJoin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    console.log(formData);
-    try {
-      // Validate all required fields
-      if (!formData.name || !formData.email || !formData.referralSource) {
-        throw new Error('Please fill in all fields');
-      }
+const handleJoin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+  setError('');
   
-      // Validate email format
-      if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email)) {
-        throw new Error('Invalid email address');
-      }
-  
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      setSuccessData({
-        position: 2295,
-        totalCount: 2295,
-        referralLink: 'https://visiontrack.com/waitlist?ref=ABC123'
-      });
-      setViewState('success');
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Something went wrong');
-    } finally {
-      setLoading(false);
+  try {
+    // Validate all required fields
+    if (!formData.name || !formData.email || !formData.referralSource) {
+      throw new Error('Please fill in all fields');
+    }
+
+    // Validate email format
+    if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email)) {
+      throw new Error('Invalid email address');
+    }
+
+    const response = await fetch('/api/waitlist/join', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to join waitlist');
+    }
+
+    setSuccessData(data);
+    setViewState('success');
+  } catch (error) {
+    setError(error instanceof Error ? error.message : 'Something went wrong');
+  } finally {
+    setLoading(false);
     }
   };
-
+  
+  // Update the handleStatusCheck function
   const handleStatusCheck = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+  e.preventDefault();
+  setLoading(true);
+  setError('');
 
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setSuccessData({
-        position: 2295,
-        totalCount: 2295,
-        referralLink: 'https://visiontrack.com/waitlist?ref=ABC123'
-      });
-      setViewState('success');
-    } catch (error) {
-      setError('Email not found in waitlist.');
-    } finally {
-      setLoading(false);
+  try {
+    const response = await fetch('/api/waitlist/status', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to check status');
     }
-  };
+
+    setSuccessData(data);
+    setViewState('success');
+  } catch (error) {
+    setError(error instanceof Error ? error.message : 'Email not found in waitlist');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const copyToClipboard = () => {
     if (successData?.referralLink) {
