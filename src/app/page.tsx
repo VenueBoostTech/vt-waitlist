@@ -1,8 +1,11 @@
 // app/page.tsx
 import { Metadata } from 'next'
+import { Header } from '@/components/landing/Header'
 import { HeroSection } from '@/components/landing/HeroSection'
+import { FeaturesSection } from '@/components/landing/FeaturesSection'
 import { TemplatesSection } from '@/components/landing/TemplatesSection'
 import { PricingSection } from '@/components/landing/PricingSection'
+import { Footer } from '@/components/landing/Footer'
 
 export const metadata: Metadata = {
   title: 'OmniStack - Enterprise Waitlist Management',
@@ -41,10 +44,15 @@ export const metadata: Metadata = {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <HeroSection />
-      <TemplatesSection />
-      <PricingSection />
+    <div className="min-h-screen bg-white">
+      <Header />
+      <main>
+        <HeroSection />
+        <FeaturesSection />
+        <TemplatesSection />
+        <PricingSection />
+      </main>
+      <Footer />
     </div>
   )
 }

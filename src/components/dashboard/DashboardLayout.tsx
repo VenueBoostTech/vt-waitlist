@@ -1,11 +1,11 @@
-// components/dashboard/DashboardLayout.tsx
 'use client'
 
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'
-import { Menu, X, Home, List, ChartBar, Settings } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
+import { Menu, X, Home, List, ChartBar, Settings, CreditCard } from 'lucide-react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,11 +21,19 @@ const navigation = [
   { name: 'Waitlists', href: '/dashboard/waitlists', icon: List },
   { name: 'Analytics', href: '/dashboard/analytics', icon: ChartBar },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+  { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const pathname = usePathname()
+  const router = useRouter()
+  const supabase = createClientComponentClient()
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    router.push('/auth/login')
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -67,11 +75,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Billing</DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href="/dashboard/settings" className="w-full">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href="/dashboard/settings" className="w-full">Settings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href="/dashboard/billing" className="w-full">Billing</Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600">Log out</DropdownMenuItem>
+                <DropdownMenuItem className="text-red-600" onSelect={handleSignOut}>
+                  Sign Out
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

@@ -42,44 +42,46 @@ export function LoginForm() {
   }
 
   return (
-    <div className="p-8 bg-white rounded-lg shadow">
-      <h1 className="text-2xl font-bold mb-6 text-center">Sign In</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-[#a47764] focus:ring-[#a47764] sm:text-sm"
-          />
-        </div>
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-            Password
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-[#a47764] focus:ring-[#a47764] sm:text-sm"
-          />
-        </div>
-        {error && (
-          <div className="text-red-500 text-sm">{error}</div>
-        )}
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-[#a47764] text-white py-2 px-4 rounded-md hover:bg-[#b58775] disabled:opacity-50"
-        >
-          {isLoading ? 'Signing in...' : 'Sign in'}
-        </button>
-      </form>
+    <div className="w-full max-w-md mx-auto bg-white pt-32 pb-16">
+      <div className="bg-white rounded-lg shadow-lg p-8">
+        <h1 className="text-2xl text-gray-700 font-semibold text-center mb-8">Sign In</h1>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-[#a47764] focus:ring-[#a47764] sm:text-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-[#a47764] focus:ring-[#a47764] sm:text-sm"
+            />
+          </div>
+          {error && (
+            <div className="text-red-500 text-sm">{error}</div>
+          )}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-[#a47764] text-white py-2 px-4 rounded-md hover:bg-[#b58775] disabled:opacity-50"
+          >
+            {isLoading ? 'Signing in...' : 'Sign in'}
+          </button>
+        </form>
+      </div>
     </div>
   )
 }

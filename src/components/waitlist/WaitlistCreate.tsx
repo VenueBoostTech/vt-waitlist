@@ -14,12 +14,19 @@ interface FormData {
       primary: string
     }
   }
+  slug?: string
+}
+
+const validateSubdomain = (subdomain: string) => {
+  const regex = /^[a-z0-9-]+$/
+  return regex.test(subdomain)
 }
 
 export default function WaitlistCreate() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [subdomainError, setSubdomainError] = useState('')
   const [formData, setFormData] = useState<FormData>({
     name: '',
     templateId: '1',
@@ -31,27 +38,41 @@ export default function WaitlistCreate() {
     }
   })
 
+  const handleSubdomainChange = (value: string) => {
+    const subdomain = value.toLowerCase()
+    
+    if (!validateSubdomain(subdomain) && subdomain !== '') {
+      setSubdomainError('Only lowercase letters, numbers, and hyphens are allowed')
+    } else {
+      setSubdomainError('')
+    }
+
+    setFormData({ ...formData, subdomain })
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (subdomainError) return
+
     setLoading(true)
     setError('')
 
     try {
-      const response = await fetch('/api/waitlist/create', {
+      const response = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       })
 
       if (!response.ok) {
-        throw new Error('Failed to create waitlist')
+        const data = await response.json()
+        throw new Error(data.error || 'Failed to create waitlist')
       }
 
       const data = await response.json()
       router.push(`/dashboard/waitlists/${data.id}`)
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Something went wrong')
-    } finally {
       setLoading(false)
     }
   }
@@ -74,58 +95,74 @@ export default function WaitlistCreate() {
       {/* Form */}
       <div className="bg-white rounded-lg shadow p-6">
         <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Waitlist Name
             </label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a47764] focus:border-[#a47764]"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900"
               placeholder="Enter waitlist name"
               required
+              minLength={3}
+              maxLength={50}
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Template
             </label>
             <select
               value={formData.templateId}
               onChange={(e) => setFormData({ ...formData, templateId: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a47764] focus:border-[#a47764]"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900"
               required
             >
-              <option value="1">Template One</option>
-              <option value="2">Template Two</option>
-              <option value="3">Template Three</option>
-              <option value="4">Template Four</option>
+              <option value="1">Simple - Basic waitlist with email capture</option>
+              <option value="2">Professional - Features and benefits layout</option>
+              <option value="3">Referral - Built-in referral system</option>
+              <option value="4">Enterprise - Custom fields and branding</option>
             </select>
+            <p className="mt-1 text-sm text-gray-500">
+              You can customize the template after creation
+            </p>
           </div>
 
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Subdomain
             </label>
             <div className="flex rounded-lg">
               <input
                 type="text"
                 value={formData.subdomain}
-                onChange={(e) => setFormData({ ...formData, subdomain: e.target.value })}
-                className="flex-1 px-3 py-2 border border-r-0 border-gray-300 rounded-l-lg focus:ring-2 focus:ring-[#a47764] focus:border-[#a47764]"
+                onChange={(e) => handleSubdomainChange(e.target.value)}
+                className={`flex-1 px-4 py-3 border border-r-0 border-gray-300 rounded-l-lg focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900 ${
+                  subdomainError ? 'border-red-300' : ''
+                }`}
                 placeholder="your-waitlist"
                 required
+                pattern="[a-z0-9-]+"
+                minLength={3}
+                maxLength={63}
               />
-              <span className="px-3 py-2 bg-gray-50 border border-l-0 border-gray-300 rounded-r-lg text-gray-500">
+              <span className="px-4 py-3 bg-gray-50 border border-l-0 border-gray-300 rounded-r-lg text-gray-500">
                 .visiontrack.xyz
               </span>
             </div>
+            {subdomainError && (
+              <p className="mt-1 text-sm text-red-600">{subdomainError}</p>
+            )}
+            <p className="mt-1 text-sm text-gray-500">
+              This will be your waitlist's URL. Only lowercase letters, numbers, and hyphens.
+            </p>
           </div>
 
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Brand Color
             </label>
             <div className="flex items-center space-x-4">
@@ -165,10 +202,17 @@ export default function WaitlistCreate() {
             </Link>
             <button
               type="submit"
-              disabled={loading}
-              className="bg-[#a47764] hover:bg-[#b58775] text-white px-6 py-2 rounded-lg disabled:opacity-50"
+              disabled={loading || !!subdomainError}
+              className="bg-[#a47764] hover:bg-[#b58775] text-white px-6 py-3 rounded-lg disabled:opacity-50 flex items-center space-x-2"
             >
-              {loading ? 'Creating...' : 'Create Waitlist'}
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Creating...</span>
+                </>
+              ) : (
+                'Create Waitlist'
+              )}
             </button>
           </div>
         </form>

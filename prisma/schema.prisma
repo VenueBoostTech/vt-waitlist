@@ -27,8 +27,8 @@ model Client {
   updatedAt      DateTime         @updatedAt
   waitlists      Waitlist[]      
   billingHistory BillingHistory[] 
-  supabaseId     String          @unique  // Link to Supabase user
-  platforms      String[]         // Which platforms they use
+  supabaseId     String          @unique
+  platforms      String[]
 }
 
 model BillingHistory {
@@ -51,8 +51,10 @@ model Waitlist {
   subdomain     String?         
   slug          String          
   customization Json?           
-  status        String          @default("active") 
   settings      Json?           
+  status        String          @default("active") 
+  content       Json
+  style         Json
   client        Client          @relation(fields: [clientId], references: [id])
   clientId      String          @db.ObjectId
   entries       WaitlistEntry[]
