@@ -45,6 +45,9 @@ export async function POST(req: Request) {
       templateId: parseInt(body.templateId),
       subdomain: body.subdomain.replace(/\.+$/, ''),
       slug,
+      style: {
+
+      },
       client: {
         connect: { id: client.id }
       },
