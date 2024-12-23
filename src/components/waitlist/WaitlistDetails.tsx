@@ -48,10 +48,10 @@ export default function WaitlistDetails({ id }: { id: string }) {
         const [waitlistData, subscribersData] = await Promise.all([
           waitlistRes.json(),
           subscribersRes.json()
-        ])
+        ])        
 
-        setWaitlist(waitlistData)
-        setSubscribers(subscribersData)
+        setWaitlist(waitlistData.data)
+        setSubscribers(subscribersData.data)
       } catch (error) {
         setError(error instanceof Error ? error.message : 'Something went wrong')
       } finally {

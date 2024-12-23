@@ -70,7 +70,7 @@ export default function WaitlistCreate() {
       }
 
       const data = await response.json()
-      router.push(`/dashboard/waitlists/${data.id}`)
+      router.push(`/dashboard/waitlists/${data.data.id}`)
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Something went wrong')
       setLoading(false)

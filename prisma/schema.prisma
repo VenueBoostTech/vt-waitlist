@@ -53,8 +53,8 @@ model Waitlist {
   customization Json?           
   settings      Json?           
   status        String          @default("active") 
-  content       Json
-  style         Json
+  content       Json?
+  style         Json?
   client        Client          @relation(fields: [clientId], references: [id])
   clientId      String          @db.ObjectId
   entries       WaitlistEntry[]
