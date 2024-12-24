@@ -10,6 +10,7 @@ export async function POST(req: Request) {
     const hashedPassword = await bcrypt.hash('test1234', 10)
 
     const client = await prisma.client.create({
+      // @ts-ignore
       data: {
         name: 'VisionTrack',
         email: 'info@visiontrack.xyz',

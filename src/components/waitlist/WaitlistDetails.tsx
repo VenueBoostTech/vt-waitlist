@@ -12,6 +12,8 @@ import AllSignups from "./AllSignups";
 import SettingsContent from "./SettingsContent";
 import OffboardedSignups from "./OffboardedSignups";
 import ImportAndExport from "./ImportAndExport";
+import AutomationsContent from "./AutomationsContent";
+import AnalyticsContent from "./AnalyticsContent";
 
 interface WaitlistData {
   id: string;
@@ -270,13 +272,13 @@ export default function WaitlistDetails({ id }: { id: string }) {
           <SettingsContent />
         </Tab.Content>
         <Tab.Content value="analytics" className="mt-6">
-          <div className="text-center text-gray-500">Analytics content coming soon</div>
+          <AnalyticsContent />
         </Tab.Content>
         <Tab.Content value="email" className="mt-6">
           <div className="text-center text-gray-500">Email content coming soon</div>
-        </Tab.Content>
+        </Tab.Content>  
         <Tab.Content value="automations" className="mt-6">
-          <div className="text-center text-gray-500">Automations content coming soon</div>
+          <AutomationsContent />
         </Tab.Content>
       </Tab.Root>
     </div>
