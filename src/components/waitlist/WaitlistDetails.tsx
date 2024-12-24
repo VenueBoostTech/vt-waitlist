@@ -9,6 +9,7 @@ import * as Tab from "@radix-ui/react-tabs";
 // @ts-ignore
 import Editor from "./editor";
 import AllSignups from "./AllSignups";
+import SettingsContent from "./SettingsContent";
 import OffboardedSignups from "./OffboardedSignups";
 import ImportAndExport from "./ImportAndExport";
 
@@ -266,7 +267,7 @@ export default function WaitlistDetails({ id }: { id: string }) {
 
         {/* Other Tabs Content */}
         <Tab.Content value="settings" className="mt-6">
-          <div className="text-center text-gray-500">Settings content coming soon</div>
+          <SettingsContent />
         </Tab.Content>
         <Tab.Content value="analytics" className="mt-6">
           <div className="text-center text-gray-500">Analytics content coming soon</div>
