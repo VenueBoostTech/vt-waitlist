@@ -278,7 +278,7 @@ export default function WaitlistSimpleEdit({ id }: WaitlistSimpleEditProps) {
                   <div className="flex items-center space-x-4">
                     <input
                       type="color"
-                      value={waitlist.style.colors.primary}
+                      value={waitlist?.style?.colors?.primary}
                       onChange={(e) => setWaitlist({
                         ...waitlist,
                         style: {

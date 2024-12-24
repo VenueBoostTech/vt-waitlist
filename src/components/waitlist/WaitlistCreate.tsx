@@ -1,94 +1,104 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { ChevronLeft } from 'lucide-react'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 
 interface FormData {
-  name: string
-  templateId: string
-  subdomain: string
+  name: string;
+  templateId: string;
+  subdomain: string;
   customization: {
     colors: {
-      primary: string
-    }
-  }
-  slug?: string
+      primary: string;
+    };
+  };
+  slug?: string;
+  spots_skipped_on_referral: number;
+  email_new_signups: boolean;
+  verify_signups_by_email: boolean;
 }
 
 const validateSubdomain = (subdomain: string) => {
-  const regex = /^[a-z0-9-]+$/
-  return regex.test(subdomain)
-}
+  const regex = /^[a-z0-9-]+$/;
+  return regex.test(subdomain);
+};
 
 export default function WaitlistCreate() {
-  const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [subdomainError, setSubdomainError] = useState('')
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [subdomainError, setSubdomainError] = useState("");
   const [formData, setFormData] = useState<FormData>({
-    name: '',
-    templateId: '1',
-    subdomain: '',
+    name: "",
+    templateId: "1",
+    subdomain: "",
     customization: {
       colors: {
-        primary: '#a47764'
-      }
-    }
-  })
+        primary: "#a47764",
+      },
+    },
+    spots_skipped_on_referral: 0,
+    email_new_signups: false,
+    verify_signups_by_email: false,
+  });
 
   const handleSubdomainChange = (value: string) => {
-    const subdomain = value.toLowerCase()
-    
-    if (!validateSubdomain(subdomain) && subdomain !== '') {
-      setSubdomainError('Only lowercase letters, numbers, and hyphens are allowed')
+    const subdomain = value.toLowerCase();
+
+    if (!validateSubdomain(subdomain) && subdomain !== "") {
+      setSubdomainError(
+        "Only lowercase letters, numbers, and hyphens are allowed"
+      );
     } else {
-      setSubdomainError('')
+      setSubdomainError("");
     }
 
-    setFormData({ ...formData, subdomain })
-  }
+    setFormData({ ...formData, subdomain });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (subdomainError) return
+    e.preventDefault();
+    if (subdomainError) return;
 
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError("");
 
     try {
-      const response = await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
-      })
+      });
 
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Failed to create waitlist')
+        const data = await response.json();
+        throw new Error(data.error || "Failed to create waitlist");
       }
 
-      const data = await response.json()
-      router.push(`/dashboard/waitlists/${data.data.id}`)
+      const data = await response.json();
+      router.push(`/dashboard/waitlists/${data.data.id}`);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Something went wrong')
-      setLoading(false)
+      setError(error instanceof Error ? error.message : "Something went wrong");
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Link 
-            href="/dashboard/waitlists" 
+          <Link
+            href="/dashboard/waitlists"
             className="text-gray-600 hover:text-gray-900"
           >
             <ChevronLeft className="w-5 h-5" />
           </Link>
-          <h1 className="text-2xl font-semibold text-gray-900">Create New Waitlist</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Create New Waitlist
+          </h1>
         </div>
       </div>
 
@@ -102,7 +112,9 @@ export default function WaitlistCreate() {
             <input
               type="text"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900"
               placeholder="Enter waitlist name"
               required
@@ -117,12 +129,18 @@ export default function WaitlistCreate() {
             </label>
             <select
               value={formData.templateId}
-              onChange={(e) => setFormData({ ...formData, templateId: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, templateId: e.target.value })
+              }
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900"
               required
             >
-              <option value="1">Simple - Basic waitlist with email capture</option>
-              <option value="2">Professional - Features and benefits layout</option>
+              <option value="1">
+                Simple - Basic waitlist with email capture
+              </option>
+              <option value="2">
+                Professional - Features and benefits layout
+              </option>
               <option value="3">Referral - Built-in referral system</option>
               <option value="4">Enterprise - Custom fields and branding</option>
             </select>
@@ -141,7 +159,7 @@ export default function WaitlistCreate() {
                 value={formData.subdomain}
                 onChange={(e) => handleSubdomainChange(e.target.value)}
                 className={`flex-1 px-4 py-3 border border-r-0 border-gray-300 rounded-l-lg focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900 ${
-                  subdomainError ? 'border-red-300' : ''
+                  subdomainError ? "border-red-300" : ""
                 }`}
                 placeholder="your-waitlist"
                 required
@@ -157,8 +175,66 @@ export default function WaitlistCreate() {
               <p className="mt-1 text-sm text-red-600">{subdomainError}</p>
             )}
             <p className="mt-1 text-sm text-gray-500">
-              This will be your waitlist's URL. Only lowercase letters, numbers, and hyphens.
+              This will be your waitlist's URL. Only lowercase letters, numbers,
+              and hyphens.
             </p>
+          </div>
+
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Spots Skipped on Referral
+            </label>
+            <input
+              type="number"
+              value={formData.spots_skipped_on_referral}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  spots_skipped_on_referral: Number(e.target.value),
+                })
+              }
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900"
+              placeholder="Enter number of spots skipped on referral"
+              required
+            />
+          </div>
+
+          <div className="flex gap-5">
+            <div className="space-y-1 flex gap-1">
+              <input
+                type="checkbox"
+                checked={formData.email_new_signups}
+                style={{ width: "16px", height: "16px" }}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    email_new_signups: e.target.checked,
+                  })
+                }
+                className="mt-1"
+              />
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email New Signups
+              </label>
+            </div>
+
+            <div className="space-y-1 flex gap-1">
+              <input
+                type="checkbox"
+                checked={formData.verify_signups_by_email}
+                style={{ width: "16px", height: "16px" }}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    verify_signups_by_email: e.target.checked,
+                  })
+                }
+                className="mt-1"
+              />
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Verify Signups by Email
+              </label>
+            </div>
           </div>
 
           <div className="space-y-1">
@@ -169,16 +245,18 @@ export default function WaitlistCreate() {
               <input
                 type="color"
                 value={formData.customization.colors.primary}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  customization: {
-                    ...formData.customization,
-                    colors: {
-                      ...formData.customization.colors,
-                      primary: e.target.value
-                    }
-                  }
-                })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    customization: {
+                      ...formData.customization,
+                      colors: {
+                        ...formData.customization.colors,
+                        primary: e.target.value,
+                      },
+                    },
+                  })
+                }
                 className="w-16 h-16 p-1 border border-gray-300 rounded-lg"
               />
               <span className="text-sm text-gray-500">
@@ -211,12 +289,12 @@ export default function WaitlistCreate() {
                   <span>Creating...</span>
                 </>
               ) : (
-                'Create Waitlist'
+                "Create Waitlist"
               )}
             </button>
           </div>
         </form>
       </div>
     </div>
-  )
+  );
 }
