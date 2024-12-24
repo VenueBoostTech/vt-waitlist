@@ -93,14 +93,33 @@ export default function WaitlistDetails({ id }: { id: string }) {
   }
 
   if (!waitlist) return null;
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center space-x-4">
-        <Link href="/dashboard/waitlists" className="text-gray-600 hover:text-gray-900">
-          <ChevronLeft className="w-5 h-5" />
-        </Link>
-        <h1 className="text-2xl font-semibold text-gray-900">{waitlist.name}</h1>
+      {/* Header with Action Buttons */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Link href="/dashboard/waitlists" className="text-gray-600 hover:text-gray-900">
+            <ChevronLeft className="w-5 h-5" />
+          </Link>
+          <h1 className="text-2xl font-semibold text-gray-900">{waitlist.name}</h1>
+        </div>
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/dashboard/waitlists/${id}/edit`}
+            className="flex items-center space-x-2 px-4 py-2 border border-[#a47764] text-[#a47764] rounded-lg hover:bg-[#a47764]/5 transition-colors"
+          >
+            <Edit2 className="w-4 h-4" />
+            <span>Simple Edit</span>
+          </Link>
+          <Link
+            href={`/dashboard/waitlists/${id}/builder`}
+            className="flex items-center space-x-2 px-4 py-2 bg-[#a47764] text-white rounded-lg hover:bg-[#b58775] transition-colors"
+          >
+            <Settings className="w-4 h-4" />
+            <span>Advanced Builder</span>
+          </Link>
+        </div>
       </div>
 
       {/* Main Tabs */}
@@ -115,7 +134,7 @@ export default function WaitlistDetails({ id }: { id: string }) {
                 : "text-[#a47764] hover:bg-white/[0.12] hover:text-[#b58775]"
             )}
           >
-            Editor & Builder
+            General
           </Tab.Trigger>
           <Tab.Trigger
             value="signups"
@@ -174,25 +193,11 @@ export default function WaitlistDetails({ id }: { id: string }) {
           </Tab.Trigger>
         </Tab.List>
 
-        {/* Editor Content */}
+        {/* Editor Content (now General) */}
         <Tab.Content value="editor">
-          <div className="flex justify-end space-x-3 mt-6 mb-6">
-            <Link
-              href={`/dashboard/waitlists/${id}/edit`}
-              className="flex items-center space-x-2 px-4 py-2 text-[#a47764] hover:text-[#b58775] text-sm font-medium"
-            >
-              <Edit2 className="w-4 h-4" />
-              <span>Simple Edit</span>
-            </Link>
-            <Link
-              href={`/dashboard/waitlists/${id}/builder`}
-              className="flex items-center space-x-2 px-4 py-2 bg-[#a47764] text-white rounded-lg hover:bg-[#b58775]"
-            >
-              <Settings className="w-4 h-4" />
-              <span>Advanced Builder</span>
-            </Link>
+          <div className="mt-6">
+            <Editor waitlist={waitlist} />
           </div>
-          <Editor waitlist={waitlist} />
         </Tab.Content>
 
         {/* Signups Content */}
@@ -247,7 +252,7 @@ export default function WaitlistDetails({ id }: { id: string }) {
 
             <div className="mt-6">
               <Tab.Content value="allSignups">
-              <AllSignups waitlist={waitlist} />
+                <AllSignups waitlist={waitlist} />
               </Tab.Content>
               <Tab.Content value="offboardedSignups">
                 <OffboardedSignups waitlist={waitlist} />
