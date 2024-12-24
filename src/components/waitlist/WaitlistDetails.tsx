@@ -93,27 +93,6 @@ export default function WaitlistDetails({ id }: { id: string }) {
   }
 
   if (!waitlist) return null;
-
-  const NoSignupsMessage = () => (
-    <div className="bg-white rounded-lg border border-gray-200 p-8 text-center mt-6">
-      <h3 className="text-lg font-medium text-gray-900 mb-2">No signups yet</h3>
-      <p className="text-gray-500 mb-6">Signups will appear here when they join your waitlist.</p>
-      <div className="space-y-4">
-        <button className="w-full max-w-sm mx-auto px-4 py-2 bg-[#a47764] text-white rounded-lg hover:bg-[#b58775] transition-colors">
-          Import users
-        </button>
-        <p className="text-sm text-gray-500">or share your waitlist</p>
-        <div className="flex items-center justify-between bg-gray-50 rounded-lg p-3 max-w-md mx-auto">
-          <span className="text-sm text-gray-600">https://test.visiontrack.xyz</span>
-          <button className="flex items-center text-[#a47764] hover:text-[#b58775]">
-            <Copy className="w-4 h-4 mr-1" />
-            <span className="text-sm">Copy</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -268,11 +247,7 @@ export default function WaitlistDetails({ id }: { id: string }) {
 
             <div className="mt-6">
               <Tab.Content value="allSignups">
-                {subscribers.length === 0 ? (
-                  <NoSignupsMessage />
-                ) : (
-                  <AllSignups waitlist={waitlist} />
-                )}
+              <AllSignups waitlist={waitlist} />
               </Tab.Content>
               <Tab.Content value="offboardedSignups">
                 <OffboardedSignups waitlist={waitlist} />
