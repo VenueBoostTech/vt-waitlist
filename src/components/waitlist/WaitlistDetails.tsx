@@ -1,73 +1,88 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { ChevronLeft, Link as LinkIcon, Copy, Edit2, Settings, Users2, BarChart3, Share } from 'lucide-react'
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  ChevronLeft,
+  Edit2,
+  Settings,
+  Search,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import * as Tab from "@radix-ui/react-tabs";
+import Editor from "./editor";
+import AllSignups from "./AllSignups";
+import OffboardedSignups from "./OffboardedSignups";
+import ImportAndExport from "./ImportAndExport";
 
 interface WaitlistData {
-  id: string
-  name: string
-  subdomain: string
-  subscribers: number
-  createdAt: string
+  id: string;
+  name: string;
+  subdomain: string;
+  subscribers: number;
+  createdAt: string;
   template: {
-    id: string
-    name: string
-  }
+    id: string;
+    name: string;
+  };
 }
 
 interface Subscriber {
-  id: string
-  email: string
-  name: string
-  position: number
-  joinedAt: string
-  referralCount: number
+  id: string;
+  email: string;
+  name: string;
+  position: number;
+  joinedAt: string;
+  referralCount: number;
 }
 
 export default function WaitlistDetails({ id }: { id: string }) {
-  const router = useRouter()
-  const [waitlist, setWaitlist] = useState<WaitlistData | null>(null)
-  const [subscribers, setSubscribers] = useState<Subscriber[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  const router = useRouter();
+  const [waitlist, setWaitlist] = useState<WaitlistData | null>(null);
+  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [selectedTab, setSelectedTab]: any = useState("editor");
+  const [selectedSubTab, setSelectedSubTab]: any = useState("allSignups");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [waitlistRes, subscribersRes] = await Promise.all([
           fetch(`/api/waitlist/${id}`),
-          fetch(`/api/waitlist/${id}/subscribers`)
-        ])
+          fetch(`/api/waitlist/${id}/subscribers`),
+        ]);
 
         if (!waitlistRes.ok || !subscribersRes.ok) {
-          throw new Error('Failed to fetch data')
+          throw new Error("Failed to fetch data");
         }
 
         const [waitlistData, subscribersData] = await Promise.all([
           waitlistRes.json(),
-          subscribersRes.json()
-        ])        
+          subscribersRes.json(),
+        ]);
 
-        setWaitlist(waitlistData.data)
-        setSubscribers(subscribersData.data)
+        setWaitlist(waitlistData.data);
+        setSubscribers(subscribersData.data);
       } catch (error) {
-        setError(error instanceof Error ? error.message : 'Something went wrong')
+        setError(
+          error instanceof Error ? error.message : "Something went wrong"
+        );
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchData()
-  }, [id])
+    fetchData();
+  }, [id]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#a47764]"></div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -75,30 +90,33 @@ export default function WaitlistDetails({ id }: { id: string }) {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <p className="text-red-500 mb-4">{error}</p>
-          <Link href="/dashboard/waitlists" className="text-[#a47764] hover:text-[#b58775]">
+          <Link
+            href="/dashboard/waitlists"
+            className="text-[#a47764] hover:text-[#b58775]"
+          >
             Return to Waitlists
           </Link>
         </div>
       </div>
-    )
+    );
   }
 
-  if (!waitlist) return null
-
-  const waitlistUrl = `https://${waitlist.subdomain}.visiontrack.xyz`
+  if (!waitlist) return null;
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Link 
-            href="/dashboard/waitlists" 
+          <Link
+            href="/dashboard/waitlists"
             className="text-gray-600 hover:text-gray-900"
           >
             <ChevronLeft className="w-5 h-5" />
           </Link>
-          <h1 className="text-2xl font-semibold text-gray-900">{waitlist.name}</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">
+            {waitlist.name}
+          </h1>
         </div>
         <div className="flex items-center space-x-3">
           <Link
@@ -118,117 +136,101 @@ export default function WaitlistDetails({ id }: { id: string }) {
         </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-gray-500">Total Subscribers</h3>
-            <span className="flex h-8 w-8 rounded-full bg-[#f8f5f4] items-center justify-center">
-              <Users2 className="h-4 w-4 text-[#a47764]" />
-            </span>
-          </div>
-          <p className="text-2xl font-semibold text-gray-900 mt-2">
-            {waitlist.subscribers}
-          </p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-gray-500">Conversion Rate</h3>
-            <span className="flex h-8 w-8 rounded-full bg-[#f8f5f4] items-center justify-center">
-              <BarChart3 className="h-4 w-4 text-[#a47764]" />
-            </span>
-          </div>
-          <p className="text-2xl font-semibold text-gray-900 mt-2">24.3%</p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-gray-500">Referral Rate</h3>
-            <span className="flex h-8 w-8 rounded-full bg-[#f8f5f4] items-center justify-center">
-              <Share className="h-4 w-4 text-[#a47764]" />
-            </span>
-          </div>
-          <p className="text-2xl font-semibold text-gray-900 mt-2">12.8%</p>
-        </div>
-      </div>
-
-      {/* URL Info */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-medium text-gray-900">Waitlist URL</h2>
-          <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
-            Active
-          </span>
-        </div>
-        <div className="flex items-center space-x-4">
-          <div className="flex-1 flex items-center space-x-2 px-4 py-3 bg-gray-50 rounded-lg">
-            <LinkIcon className="w-4 h-4 text-gray-400" />
-            <span className="text-gray-900">{waitlistUrl}</span>
-          </div>
-          <button
-            onClick={() => navigator.clipboard.writeText(waitlistUrl)}
-            className="flex items-center space-x-2 px-4 py-3 text-[#a47764] hover:text-[#b58775] rounded-lg hover:bg-[#f8f5f4]"
+      <Tab.Root
+        value={selectedTab}
+        onValueChange={setSelectedTab}
+        defaultValue="editor"
+      >
+        <Tab.List className="flex space-x-1 rounded-xl bg-gray-100 p-1">
+          <Tab.Trigger
+            value="editor"
+            className={cn(
+              "w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-[#a47764]",
+              selectedTab == "editor"
+                ? "bg-white shadow"
+                : "text-[#a47764] hover:bg-white/[0.12] hover:text-[#b58775]"
+            )}
           >
-            <Copy className="w-4 h-4" />
-            <span className="text-sm font-medium">Copy</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Subscribers Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-lg font-medium text-gray-900">Recent Subscribers</h2>
-          <button className="text-sm text-[#a47764] hover:text-[#b58775] font-medium">
-            View All →
-          </button>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Email
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Position
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Joined
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Referrals
-                </th>
-              </tr>
-            </thead>
-            {/* <tbody className="bg-white divide-y divide-gray-200">
-              {subscribers?.map((subscriber) => (
-                <tr key={subscriber.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{subscriber.name}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{subscriber.email}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">#{subscriber.position}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {new Date(subscriber.joinedAt).toLocaleDateString()}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{subscriber.referralCount}</div>
-                  </td>
-                </tr>
-              ))}
-            </tbody> */}
-          </table>
-        </div>
-      </div>
+            Editor
+          </Tab.Trigger>
+          <Tab.Trigger
+            value="signups"
+            className={cn(
+              "w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-[#a47764]",
+              selectedTab == "signups"
+                ? "bg-white shadow"
+                : "text-[#a47764] hover:bg-white/[0.12] hover:text-[#b58775]"
+            )}
+          >
+            Signups
+          </Tab.Trigger>
+        </Tab.List>
+        <Tab.Content value="editor">
+          <Editor waitlist={waitlist} />
+        </Tab.Content>
+        <Tab.Content value="signups">
+          <Tab.Root
+            value={selectedSubTab}
+            onValueChange={setSelectedSubTab}
+            defaultValue="allSignups"
+          >
+            <div className="flex items-center justify-between gap-3 mt-3">
+              <Tab.List className="flex rounded-xl bg-gray-100 p-1 w-[50%]">
+                <Tab.Trigger
+                  value="allSignups"
+                  className={cn(
+                    "w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-[#a47764]",
+                    selectedSubTab === "allSignups"
+                      ? "bg-white shadow"
+                      : "text-[#a47764] hover:bg-white/[0.12] hover:text-[#b58775]"
+                  )}
+                >
+                  All Signups
+                </Tab.Trigger>
+                <Tab.Trigger
+                  value="offboardedSignups"
+                  className={cn(
+                    "w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-[#a47764]",
+                    selectedSubTab === "offboardedSignups"
+                      ? "bg-white shadow"
+                      : "text-[#a47764] hover:bg-white/[0.12] hover:text-[#b58775]"
+                  )}
+                >
+                  Offboarded Signups
+                </Tab.Trigger>
+                <Tab.Trigger
+                  value="importAndExport"
+                  className={cn(
+                    "w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-[#a47764]",
+                    selectedSubTab === "importAndExport"
+                      ? "bg-white shadow"
+                      : "text-[#a47764] hover:bg-white/[0.12] hover:text-[#b58775]"
+                  )}
+                >
+                  Import and Export
+                </Tab.Trigger>
+              </Tab.List>
+              <div className="flex items-center relative">
+                <Search className="h-5 w-5 absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" />
+              </div>
+              <input
+                type="search"
+                placeholder="Search Signups"
+                className="border border-gray-300 rounded-md p-2  w-[50%] outline-none pl-8"
+              />
+            </div>
+            <Tab.Content value="allSignups">
+              <AllSignups waitlist={waitlist} />
+            </Tab.Content>
+            <Tab.Content value="offboardedSignups">
+              <OffboardedSignups waitlist={waitlist} />
+            </Tab.Content>
+            <Tab.Content value="importAndExport">
+              <ImportAndExport waitlist={waitlist} />
+            </Tab.Content>
+          </Tab.Root>
+        </Tab.Content>
+      </Tab.Root>
     </div>
-  )
+  );
 }
