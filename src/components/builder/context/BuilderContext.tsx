@@ -1,5 +1,5 @@
 // src/components/builder/context/BuilderContext.tsx
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 
 interface BuilderContextType {
   content: any
@@ -20,8 +20,17 @@ interface BuilderContextType {
 }
 
 const BuilderContext = createContext<BuilderContextType | undefined>(undefined)
+const debounce: any = (func : any, delay: number) => {
+  let timer : any;
+  return (...args : any) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
+};
 
-export function BuilderProvider({ children, initialContent }: { children: React.ReactNode, initialContent: any }) {
+export function BuilderProvider({ children, initialContent, onChange }: { children: React.ReactNode, initialContent: any , onChange?: (content: any) => void}) {
   const [content, setContent] = useState(initialContent)
   const [activeSection, setActiveSection] = useState<string | null>(null)
   const [style, setStyle] = useState({
@@ -35,13 +44,21 @@ export function BuilderProvider({ children, initialContent }: { children: React.
     font: 'font-sans'
   })
 
+  const handler = debounce(() => {
+    onChange?.(content);
+  }, 800); // Adjust delay as needed
+
+  useEffect(() => {
+    handler();
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [content]);
+
   const updateSection = (sectionId: string, data: any) => {
-    setContent(prev => ({
+    setContent((prev:any) => ({
       ...prev,
-      [sectionId]: {
-        ...prev[sectionId],
-        ...data
-      }
+      [sectionId]: data
     }))
   }
 
