@@ -3,7 +3,7 @@
 
 import { DndContext, DragEndEvent, closestCenter } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { BuilderProvider } from './context/BuilderContext'
 import { HeaderSection } from './sections/HeaderSection'
 import { FeaturesSection } from './sections/FeaturesSection'
@@ -62,16 +62,18 @@ interface Section {
 interface TemplateBuilderProps {
   initialContent: TemplateContent
   onSave: (content: TemplateContent) => Promise<void>
+  onChange?: (content: TemplateContent) => void
 }
 
-export function TemplateBuilder({ initialContent, onSave }: TemplateBuilderProps) {
+export function TemplateBuilder({ initialContent, onSave, onChange }: TemplateBuilderProps) {
+
   // Define available sections
   const sections: Section[] = useMemo(() => [
     { id: 'header', type: 'header', component: HeaderSection },
     { id: 'features', type: 'features', component: FeaturesSection },
     { id: 'form', type: 'form', component: FormSection }
   ], [])
-
+  const [content, setContent] = useState(initialContent)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -85,7 +87,7 @@ export function TemplateBuilder({ initialContent, onSave }: TemplateBuilderProps
   }
 
   // Handle save with loading and error states
-  const handleSave = async (content: TemplateContent) => {
+  const handleSave = async () => {
     try {
       setLoading(true)
       setError(null)
@@ -98,10 +100,12 @@ export function TemplateBuilder({ initialContent, onSave }: TemplateBuilderProps
   }
 
   return (
-    <BuilderProvider initialContent={initialContent}>
+    <BuilderProvider initialContent={initialContent} onChange={(content) => {
+      setContent(content)      
+    }}>
       <div className="flex min-h-screen bg-gray-50">
         {/* Main Content Area */}
-        <div className="flex-1 p-8 overflow-auto">
+        <div className="flex-1 pr-8 pl-1 pb-1 overflow-auto">
           <DndContext 
             onDragEnd={handleDragEnd}
             collisionDetection={closestCenter}

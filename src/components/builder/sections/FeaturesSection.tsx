@@ -1,19 +1,25 @@
-'use client'
+"use client";
 
-import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import { useBuilder } from '../context/BuilderContext'
-import { GripVertical, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react'
-import type { Feature } from '../types'
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { useBuilder } from "../context/BuilderContext";
+import {
+  GripVertical,
+  Plus,
+  Trash2,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
+import type { Feature } from "../types";
 
 interface SortableFeatureProps {
-  feature: Feature
-  index: number
-  isActive: boolean
-  onUpdate: (index: number, updates: Partial<Feature>) => void
-  onDelete: (index: number) => void
-  onMoveUp: (index: number) => void
-  onMoveDown: (index: number) => void
+  feature: Feature;
+  index: number;
+  isActive: boolean;
+  onUpdate: (index: number, updates: Partial<Feature>) => void;
+  onDelete: (index: number) => void;
+  onMoveUp: (index: number) => void;
+  onMoveDown: (index: number) => void;
 }
 
 function FeatureCard({
@@ -23,33 +29,37 @@ function FeatureCard({
   onUpdate,
   onDelete,
   onMoveUp,
-  onMoveDown
+  onMoveDown,
 }: SortableFeatureProps) {
-  const { style } = useBuilder()
+  const { style } = useBuilder();
   const {
     attributes,
     listeners,
     setNodeRef,
     transform,
     transition,
-    isDragging
-  } = useSortable({ id: feature.id })
+    isDragging,
+  } = useSortable({ id: feature.id });
 
-  const getTextColor = () => style.colors.text
+  const getTextColor = () => style.colors.text;
   const getBorderRadiusClass = () => {
     switch (style.borderRadius) {
-      case 'none': return ''
-      case 'small': return 'rounded'
-      case 'large': return 'rounded-xl'
-      default: return 'rounded-lg'
+      case "none":
+        return "";
+      case "small":
+        return "rounded";
+      case "large":
+        return "rounded-xl";
+      default:
+        return "rounded-lg";
     }
-  }
+  };
 
   const sortableStyle = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1
-  }
+    opacity: isDragging ? 0.5 : 1,
+  };
 
   if (!isActive) {
     return (
@@ -64,7 +74,10 @@ function FeatureCard({
               className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center"
               style={{ backgroundColor: `${style.colors.primary}15` }}
             >
-              <span className="text-2xl" style={{ color: style.colors.primary }}>
+              <span
+                className="text-2xl"
+                style={{ color: style.colors.primary }}
+              >
                 {feature.icon}
               </span>
             </div>
@@ -74,18 +87,18 @@ function FeatureCard({
               className="text-xl font-semibold"
               style={{ color: getTextColor() }}
             >
-              {feature.title || 'Add a title...'}
+              {feature.title || "Add a title..."}
             </h3>
             <p
               className="mt-2 text-base"
               style={{ color: getTextColor(), opacity: 0.8 }}
             >
-              {feature.description || 'Add a description...'}
+              {feature.description || "Add a description..."}
             </p>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -134,7 +147,9 @@ function FeatureCard({
               />
               <textarea
                 value={feature.description}
-                onChange={(e) => onUpdate(index, { description: e.target.value })}
+                onChange={(e) =>
+                  onUpdate(index, { description: e.target.value })
+                }
                 className="w-full text-base bg-transparent border-0 focus:ring-0 p-0 resize-none"
                 style={{ color: getTextColor(), opacity: 0.8 }}
                 placeholder="Feature description..."
@@ -151,12 +166,15 @@ function FeatureCard({
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium" style={{ color: getTextColor() }}>
+            <label
+              className="block text-sm font-medium"
+              style={{ color: getTextColor() }}
+            >
               Icon (emoji or symbol)
             </label>
             <input
               type="text"
-              value={feature.icon || ''}
+              value={feature.icon || ""}
               onChange={(e) => onUpdate(index, { icon: e.target.value })}
               className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               placeholder="Enter an emoji or symbol..."
@@ -165,60 +183,64 @@ function FeatureCard({
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export function FeaturesSection() {
-  const { content, style, activeSection, setActiveSection, updateSection } = useBuilder()
-  const features = content.features as Feature[]
-  const isActive = activeSection === 'features'
+  const { content, style, activeSection, setActiveSection, updateSection } =
+    useBuilder();
+  const features = content.features as Feature[];
+  const isActive = activeSection === "features";
 
   const getLayoutClass = () => {
-    if (!isActive && style.layout === 'grid') {
-      return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+    if (!isActive && style.layout === "grid") {
+      return "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
     }
-    return 'space-y-4'
-  }
+    return "space-y-8";
+  };
 
   const handleFeatureUpdate = (index: number, updates: Partial<Feature>) => {
-    const newFeatures = [...features]
-    newFeatures[index] = { ...newFeatures[index], ...updates }
-    updateSection('features', newFeatures)
-  }
+    const newFeatures = [...features];
+    newFeatures[index] = { ...newFeatures[index], ...updates };
+    updateSection("features", newFeatures);
+  };
 
   const handleFeatureDelete = (index: number) => {
-    const newFeatures = features.filter((_, i) => i !== index)
-    updateSection('features', newFeatures)
-  }
+    const newFeatures = features.filter((_, i) => i !== index);
+    updateSection("features", newFeatures);
+  };
 
   const handleAddFeature = () => {
     const newFeature: Feature = {
       id: `feature-${features.length + 1}`,
-      title: '',
-      description: '',
-      icon: '✨'
-    }
-    updateSection('features', [...features, newFeature])
-  }
+      title: "",
+      description: "",
+      icon: "✨",
+    };
+    updateSection("features", [...features, newFeature]);
+  };
 
-  const handleMoveFeature = (index: number, direction: 'up' | 'down') => {
+  const handleMoveFeature = (index: number, direction: "up" | "down") => {
     if (
-      (direction === 'up' && index === 0) ||
-      (direction === 'down' && index === features.length - 1)
+      (direction === "up" && index === 0) ||
+      (direction === "down" && index === features.length - 1)
     ) {
-      return
+      return;
     }
 
-    const newFeatures = [...features]
-    const newIndex = direction === 'up' ? index - 1 : index + 1
-    ;[newFeatures[index], newFeatures[newIndex]] = [newFeatures[newIndex], newFeatures[index]]
-    updateSection('features', newFeatures)
-  }
+    const newFeatures = [...features];
+    const newIndex = direction === "up" ? index - 1 : index + 1;
+    [newFeatures[index], newFeatures[newIndex]] = [
+      newFeatures[newIndex],
+      newFeatures[index],
+    ];
+    updateSection("features", newFeatures);
+  };
 
   return (
-    <div 
-      onClick={() => !isActive && setActiveSection('features')}
-      className={`relative ${!isActive ? 'cursor-pointer' : ''}`}
+    <div
+      onClick={() => !isActive && setActiveSection("features")}
+      className={`relative ${!isActive ? "cursor-pointer" : ""}`}
     >
       {!isActive && (
         <div className="absolute inset-0 bg-gray-900/0 hover:bg-gray-900/5 transition-colors rounded-lg flex items-center justify-center">
@@ -229,7 +251,7 @@ export function FeaturesSection() {
       )}
 
       <div className={getLayoutClass()}>
-        {features.map((feature, index) => (
+        {features?.map((feature, index) => (
           <FeatureCard
             key={feature.id}
             feature={feature}
@@ -237,8 +259,8 @@ export function FeaturesSection() {
             isActive={isActive}
             onUpdate={handleFeatureUpdate}
             onDelete={handleFeatureDelete}
-            onMoveUp={(index) => handleMoveFeature(index, 'up')}
-            onMoveDown={(index) => handleMoveFeature(index, 'down')}
+            onMoveUp={(index) => handleMoveFeature(index, "up")}
+            onMoveDown={(index) => handleMoveFeature(index, "down")}
           />
         ))}
       </div>
@@ -247,12 +269,12 @@ export function FeaturesSection() {
         <button
           type="button"
           onClick={handleAddFeature}
-          className="mt-4 flex items-center justify-center w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-700"
+          className="mt-8 flex items-center justify-center w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-700"
         >
           <Plus className="w-5 h-5 mr-2" />
           Add Feature
         </button>
       )}
     </div>
-  )
+  );
 }

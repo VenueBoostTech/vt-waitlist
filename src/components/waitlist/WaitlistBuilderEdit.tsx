@@ -1,131 +1,136 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { ChevronLeft, XIcon, Save, CheckCircle, AlertCircle } from 'lucide-react'
-import { TemplateBuilder } from '@/components/builder/TemplateBuilder'
-import { formatDistanceToNow } from 'date-fns'
-import { useToast } from '../../hooks/useToast'
-import { useSaveState } from '../../hooks/useSaveState'
-import { defaultTemplateContent } from '../../lib/defaultContent'  // Move template content to separate file
-import { ExitDialog } from '../../components/dialogs/ExitDialog'
-import { ShortcutsDialog } from '../../components/dialogs/ShortcutsDialog'
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import {
+  ChevronLeft,
+  Save,
+} from "lucide-react";
+import { TemplateBuilder } from "@/components/builder/TemplateBuilder";
+import { formatDistanceToNow } from "date-fns";
+import { useToast } from "../../hooks/useToast";
+import { useSaveState } from "../../hooks/useSaveState";
+import { defaultTemplateContent } from "../../lib/defaultContent"; // Move template content to separate file
+import { ExitDialog } from "../../components/dialogs/ExitDialog";
+import { ShortcutsDialog } from "../../components/dialogs/ShortcutsDialog";
 
 interface WaitlistBuilderEditProps {
-  id: string
+  id: string;
 }
 
 export default function WaitlistBuilderEdit({ id }: WaitlistBuilderEditProps) {
-  const router = useRouter()
-  const { addToast } = useToast()
-  const { saveState, setSaving, setSuccess } = useSaveState()
+  const router = useRouter();
+  const { addToast } = useToast();
+  const { saveState, setSaving, setSuccess }: any = useSaveState();
 
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [waitlist, setWaitlist] = useState<any>(null)
-  const [previewLoading, setPreviewLoading] = useState(true)
-  const [autoSave, setAutoSave] = useState(true)
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
-  const [showExitDialog, setShowExitDialog] = useState(false)
-  const [showShortcuts, setShowShortcuts] = useState(false)
-  const autoSaveDebounceRef = useRef<NodeJS.Timeout>()
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [waitlist, setWaitlist] = useState<any>(null);
+  const [previewLoading, setPreviewLoading] = useState(true);
+  const [autoSave, setAutoSave] = useState(true);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showExitDialog, setShowExitDialog] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const autoSaveDebounceRef = useRef<NodeJS.Timeout>();
 
   // Fetch waitlist data
   useEffect(() => {
     const fetchWaitlist = async () => {
       try {
-        const response = await fetch(`/api/waitlist/${id}`)
-        if (!response.ok) throw new Error('Failed to fetch waitlist')
-        const data = await response.json()
-        setWaitlist(data.data)
+        const response = await fetch(`/api/waitlist/${id}`);
+        if (!response.ok) throw new Error("Failed to fetch waitlist");
+        const data = await response.json();
+        setWaitlist(data.data);
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'Failed to load waitlist'
-        setError(message)
-        addToast({ type: 'error', message })
+        const message =
+          error instanceof Error ? error.message : "Failed to load waitlist";
+        setError(message);
+        addToast({ type: "error", message });
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    if (id) fetchWaitlist()
-  }, [id, addToast])
+    if (id) fetchWaitlist();
+  }, [id, addToast]);
 
   // Handle save
   const handleSave = async (content: any) => {
     try {
-      setSaving()
+      setSaving();
       const response = await fetch(`/api/waitlist/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content, style: content.style }),
-      })
+      });
 
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Failed to update waitlist')
+        const data = await response.json();
+        throw new Error(data.error || "Failed to update waitlist");
       }
-      
-      setSuccess('Changes saved successfully!')
-      setHasUnsavedChanges(false)
+
+      setSuccess("Changes saved successfully!");
+      setHasUnsavedChanges(false);
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to save changes'
-      setError(message)
-      addToast({ type: 'error', message })
+      const message =
+        error instanceof Error ? error.message : "Failed to save changes";
+      setError(message);
+      addToast({ type: "error", message });
     }
-  }
+  };
 
   // Handle content updates and auto-save
   const handleContentUpdate = (content: any) => {
-    setHasUnsavedChanges(true)
-    
+    setHasUnsavedChanges(true);
+
     if (autoSave) {
       if (autoSaveDebounceRef.current) {
-        clearTimeout(autoSaveDebounceRef.current)
+        clearTimeout(autoSaveDebounceRef.current);
       }
-      autoSaveDebounceRef.current = setTimeout(() => handleSave(content), 2000)
+      autoSaveDebounceRef.current = setTimeout(() => handleSave(content), 2000);
     }
-  }
+  };
 
   // Handle exit
   const handleExit = () => {
     if (hasUnsavedChanges) {
-      setShowExitDialog(true)
+      setShowExitDialog(true);
     } else {
-      router.push(`/dashboard/waitlists/${id}`)
+      router.push(`/dashboard/waitlists/${id}`);
     }
-  }
+  };
 
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyboard = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
-        e.preventDefault()
-        if (waitlist?.content) handleSave(waitlist.content)
+      if ((e.metaKey || e.ctrlKey) && e.key === "s") {
+        e.preventDefault();
+        if (waitlist?.content) handleSave(waitlist.content);
       }
-      
-      if ((e.metaKey || e.ctrlKey) && e.key === '/') {
-        e.preventDefault()
-        setShowShortcuts(true)
-      }
-    }
 
-    window.addEventListener('keydown', handleKeyboard)
-    return () => window.removeEventListener('keydown', handleKeyboard)
-  }, [waitlist])
+      if ((e.metaKey || e.ctrlKey) && e.key === "/") {
+        e.preventDefault();
+        setShowShortcuts(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyboard);
+    return () => window.removeEventListener("keydown", handleKeyboard);
+  }, [waitlist]);
 
   // Unsaved changes warning
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (hasUnsavedChanges) {
-        e.preventDefault()
-        e.returnValue = ''
+        e.preventDefault();
+        e.returnValue = "";
       }
-    }
+    };
 
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [hasUnsavedChanges])
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedChanges]);
 
   if (loading) {
     return (
@@ -142,7 +147,7 @@ export default function WaitlistBuilderEdit({ id }: WaitlistBuilderEditProps) {
           <div className="w-80 bg-white animate-pulse rounded-lg" />
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -150,18 +155,18 @@ export default function WaitlistBuilderEdit({ id }: WaitlistBuilderEditProps) {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <p className="text-red-500 mb-4">{error}</p>
-          <Link 
-            href={`/dashboard/waitlists/${id}`} 
+          <Link
+            href={`/dashboard/waitlists/${id}`}
             className="text-blue-600 hover:text-blue-700"
           >
             Return to Waitlist
           </Link>
         </div>
       </div>
-    )
+    );
   }
 
-  if (!waitlist) return null
+  if (!waitlist) return null;
 
   return (
     <>
@@ -183,33 +188,36 @@ export default function WaitlistBuilderEdit({ id }: WaitlistBuilderEditProps) {
                   Visual Builder: {waitlist.name}
                 </h1>
               </div>
-              
+
               <div className="flex items-center space-x-4">
                 <div className="flex items-center gap-2">
                   {saveState.lastSaved && (
                     <span className="text-sm text-gray-500">
-                      Last saved {formatDistanceToNow(saveState.lastSaved, { addSuffix: true })}
+                      Last saved{" "}
+                      {formatDistanceToNow(saveState.lastSaved, {
+                        addSuffix: true,
+                      })}
                     </span>
                   )}
                   <button
                     onClick={() => setAutoSave(!autoSave)}
                     className={`text-sm font-medium ${
-                      autoSave ? 'text-blue-600' : 'text-gray-500'
+                      autoSave ? "text-[#a47764]" : "text-gray-500"
                     }`}
                   >
-                    Auto-save {autoSave ? 'on' : 'off'}
+                    Auto-save {autoSave ? "on" : "off"}
                   </button>
                 </div>
-                
+
                 <div className="h-6 w-px bg-gray-200" />
-                
+
                 <Link
                   href={`/dashboard/waitlists/${id}/edit`}
-                  className="text-blue-600 hover:text-blue-700 font-medium"
+                  className="text-[#a47764] hover:text-[#a47764]/90 font-medium"
                 >
                   Switch to Simple Editor
                 </Link>
-                
+
                 <button
                   onClick={handleExit}
                   className="text-gray-600 hover:text-gray-900"
@@ -222,9 +230,9 @@ export default function WaitlistBuilderEdit({ id }: WaitlistBuilderEditProps) {
         </div>
 
         {/* Main content */}
-        <div className="flex-1 flex overflow-hidden">
-          <main className="flex-1 overflow-y-auto">
-            <div className="max-w-7xl mx-auto p-8">
+        <div className="flex-1 flex overflow-hidden pt-8">
+          <main className="flex-1 overflow-y-auto pr-8">
+            <div className="max-w-7xl mx-auto">
               <TemplateBuilder
                 initialContent={waitlist.content || defaultTemplateContent}
                 onSave={handleSave}
@@ -234,11 +242,11 @@ export default function WaitlistBuilderEdit({ id }: WaitlistBuilderEditProps) {
           </main>
 
           {/* Preview Panel */}
-          <aside className="hidden lg:block w-96 border-l bg-white overflow-y-auto">
-            <div className="p-6">
+          <aside className="hidden lg:block w-96 border-l bg-white overflow-y-auto p-6">
+            {/* <div className="p-8"> */}
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-medium text-gray-900">Preview</h3>
-                <span className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-blue-50 text-blue-600">
+                <h3 className="text-lg font-medium">Preview</h3>
+                <span className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-blue-50 text-[#a47764] cursor-pointer">
                   Live
                 </span>
               </div>
@@ -253,7 +261,7 @@ export default function WaitlistBuilderEdit({ id }: WaitlistBuilderEditProps) {
                   />
                 )}
               </div>
-            </div>
+            {/* </div> */}
           </aside>
         </div>
       </div>
@@ -263,8 +271,8 @@ export default function WaitlistBuilderEdit({ id }: WaitlistBuilderEditProps) {
         <ExitDialog
           onCancel={() => setShowExitDialog(false)}
           onConfirm={() => {
-            setShowExitDialog(false)
-            router.push(`/dashboard/waitlists/${id}`)
+            setShowExitDialog(false);
+            router.push(`/dashboard/waitlists/${id}`);
           }}
         />
       )}
@@ -274,12 +282,12 @@ export default function WaitlistBuilderEdit({ id }: WaitlistBuilderEditProps) {
       )}
 
       {/* Save indicator */}
-      {saveState.status === 'saving' && (
+      {saveState.status === "saving" && (
         <div className="fixed bottom-4 left-4 z-50 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-sm flex items-center gap-2">
           <Save className="w-3 h-3 animate-spin" />
           <span>Saving...</span>
         </div>
       )}
     </>
-  )
+  );
 }
