@@ -24,7 +24,7 @@ export const pricingPlans = [
       price: '$50/month',
       features: [
         'Everything in the Free Tier',
-        'Remove GetWaitlist Branding from the Widget',
+        'Remove OmniStack Branding from the Widget',
         'Hide Priority Counts',
         'Set Permitted Signup Domains',
         'Exclude Personal Emails',

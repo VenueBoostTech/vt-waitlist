@@ -1,8 +1,10 @@
-// components/builder/TemplateBuilder.tsx
+// src/components/builder/TemplateBuilder.tsx
 'use client'
 
-import { useState } from 'react'
-import { DndContext, DragEndEvent } from '@dnd-kit/core'
+import { DndContext, DragEndEvent, closestCenter } from '@dnd-kit/core'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { useMemo, useState } from 'react'
+import { BuilderProvider } from './context/BuilderContext'
 import { HeaderSection } from './sections/HeaderSection'
 import { FeaturesSection } from './sections/FeaturesSection'
 import { FormSection } from './sections/FormSection'
@@ -12,8 +14,11 @@ interface TemplateContent {
   header: {
     title: string
     subtitle: string
+    alignment?: 'left' | 'center' | 'right'
+    showSubtitle?: boolean
   }
   features: Array<{
+    id: string
     title: string
     description: string
     icon?: string
@@ -22,6 +27,7 @@ interface TemplateContent {
     title: string
     subtitle: string
     fields: Array<{
+      id: string
       type: string
       label: string
       placeholder: string
@@ -32,6 +38,8 @@ interface TemplateContent {
       text: string
       style: Record<string, string>
     }
+    fieldStyle?: 'minimal' | 'outlined' | 'filled'
+    buttonWidth?: 'full' | 'auto'
   }
   style: {
     colors: {
@@ -39,9 +47,16 @@ interface TemplateContent {
       background?: string
       text?: string
     }
-    spacing?: string
-    borderRadius?: string
+    spacing?: 'compact' | 'default' | 'relaxed'
+    borderRadius?: 'none' | 'small' | 'default' | 'large'
+    font?: string
   }
+}
+
+interface Section {
+  id: string
+  type: 'header' | 'features' | 'form'
+  component: React.ComponentType
 }
 
 interface TemplateBuilderProps {
@@ -50,63 +65,75 @@ interface TemplateBuilderProps {
 }
 
 export function TemplateBuilder({ initialContent, onSave }: TemplateBuilderProps) {
-  const [content, setContent] = useState(initialContent)
-  const [activeSection, setActiveSection] = useState<string | null>(null)
+  // Define available sections
+  const sections: Section[] = useMemo(() => [
+    { id: 'header', type: 'header', component: HeaderSection },
+    { id: 'features', type: 'features', component: FeaturesSection },
+    { id: 'form', type: 'form', component: FormSection }
+  ], [])
 
-  const handleSectionUpdate = (sectionId: string, newData: any) => {
-    setContent(prev => ({
-      ...prev,
-      [sectionId]: {
-        ...prev[sectionId],
-        ...newData
-      }
-    }))
-  }
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
+  // Handle drag & drop of sections
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
-    if (active.id !== over?.id) {
-      // Handle reordering if needed
+    if (over && active.id !== over.id) {
+      // Handle section reordering
+      // This will be implemented when we add the features section
+    }
+  }
+
+  // Handle save with loading and error states
+  const handleSave = async (content: TemplateContent) => {
+    try {
+      setLoading(true)
+      setError(null)
+      await onSave(content)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save changes')
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Preview Panel */}
-      <div className="flex-1 p-8 overflow-auto">
-        <DndContext onDragEnd={handleDragEnd}>
-          <div className="max-w-4xl mx-auto space-y-8">
-            <HeaderSection 
-              content={content.header}
-              isActive={activeSection === 'header'}
-              onClick={() => setActiveSection('header')}
-              onUpdate={(data) => handleSectionUpdate('header', data)}
-            />
-            
-            <FeaturesSection
-              features={content.features}
-              isActive={activeSection === 'features'}
-              onClick={() => setActiveSection('features')}
-              onUpdate={(data) => handleSectionUpdate('features', data)}
-            />
+    <BuilderProvider initialContent={initialContent}>
+      <div className="flex min-h-screen bg-gray-50">
+        {/* Main Content Area */}
+        <div className="flex-1 p-8 overflow-auto">
+          <DndContext 
+            onDragEnd={handleDragEnd}
+            collisionDetection={closestCenter}
+          >
+            <SortableContext 
+              items={sections.map(s => s.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="max-w-4xl mx-auto space-y-8">
+                {/* Error Message */}
+                {error && (
+                  <div className="bg-red-50 text-red-600 p-4 rounded-lg">
+                    {error}
+                  </div>
+                )}
 
-            <FormSection
-              form={content.form}
-              isActive={activeSection === 'form'}
-              onClick={() => setActiveSection('form')}
-              onUpdate={(data) => handleSectionUpdate('form', data)}
-            />
-          </div>
-        </DndContext>
+                {/* Sections */}
+                {sections.map((section) => {
+                  const Component = section.component
+                  return <Component key={section.id} />
+                })}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </div>
+
+        {/* Toolbar */}
+        <Toolbar onSave={handleSave} isLoading={loading} />
       </div>
-
-      {/* Toolbar */}
-      <Toolbar
-        content={content}
-        activeSection={activeSection}
-        onStyleChange={(style) => handleSectionUpdate('style', style)}
-        onSave={() => onSave(content)}
-      />
-    </div>
+    </BuilderProvider>
   )
 }
+
+// Export type for use in other components
+export type { TemplateContent }
