@@ -23,6 +23,9 @@ model Client {
   companyName    String?
   phone          String?
   address        String?
+  emailDigest    String           @default("weekly")
+  signupEmail    Boolean          @default(true)
+  referralsEmail Boolean          @default(true)
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   waitlists      Waitlist[]      
