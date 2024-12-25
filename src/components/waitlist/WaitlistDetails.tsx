@@ -6,8 +6,6 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, Edit2, Settings, Search, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import * as Tab from "@radix-ui/react-tabs";
-// @ts-ignore
-import Editor from "./editor";
 import AllSignups from "./AllSignups";
 import SettingsContent from "./SettingsContent";
 import OffboardedSignups from "./OffboardedSignups";
@@ -15,6 +13,7 @@ import ImportAndExport from "./ImportAndExport";
 import AutomationsContent from "./AutomationsContent";
 import AnalyticsContent from "./AnalyticsContent";
 import EmailContent from "./EmailContent";
+import Editor from "./Editor";
 interface WaitlistData {
   id: string;
   name: string;
