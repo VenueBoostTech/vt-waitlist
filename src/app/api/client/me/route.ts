@@ -38,7 +38,6 @@ export async function GET() {
       data: client,
     });
   } catch (error) {
-    console.log("Error fetching waitlist:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

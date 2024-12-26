@@ -1,17 +1,25 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useBuilder } from './context/BuilderContext'
-import { Palette, Layout, Type, Save, Loader2 } from 'lucide-react'
+import { useState, useEffect } from "react";
+import { useBuilder } from "./context/BuilderContext";
+import { Palette, Layout, Type, Save, Loader2 } from "lucide-react";
 
 interface ToolbarProps {
-  onSave: () => Promise<void>
-  isLoading?: boolean
+  onSave: () => Promise<void>;
+  isLoading?: boolean;
+  onChange?: (content: any) => void;
 }
 
-export function Toolbar({ onSave, isLoading }: ToolbarProps) {
-  const { content, activeSection, style, updateSection, updateStyle } = useBuilder()
-  const [activeTab, setActiveTab] = useState<'style' | 'layout' | 'typography'>('style')
+export function Toolbar({ onSave, isLoading, onChange }: ToolbarProps) {
+  const { content, activeSection, style, updateSection, updateStyle } =
+    useBuilder();
+  const [activeTab, setActiveTab] = useState<"style" | "layout" | "typography">(
+    "style"
+  );
+
+  useEffect(() => {
+    onChange?.(content);
+  }, [style]);
 
   const renderStyleTab = () => (
     <div className="space-y-6">
@@ -24,17 +32,21 @@ export function Toolbar({ onSave, isLoading }: ToolbarProps) {
               <input
                 type="color"
                 value={style.colors.primary}
-                onChange={(e) => updateStyle({
-                  colors: { ...style.colors, primary: e.target.value }
-                })}
+                onChange={(e) =>
+                  updateStyle({
+                    colors: { ...style.colors, primary: e.target.value },
+                  })
+                }
                 className="h-8 w-8 rounded border border-gray-300"
               />
               <input
                 type="text"
                 value={style.colors.primary}
-                onChange={(e) => updateStyle({
-                  colors: { ...style.colors, primary: e.target.value }
-                })}
+                onChange={(e) =>
+                  updateStyle({
+                    colors: { ...style.colors, primary: e.target.value },
+                  })
+                }
                 className="flex-1 rounded-md border-gray-300 text-sm"
               />
             </div>
@@ -46,17 +58,21 @@ export function Toolbar({ onSave, isLoading }: ToolbarProps) {
               <input
                 type="color"
                 value={style.colors.text}
-                onChange={(e) => updateStyle({
-                  colors: { ...style.colors, text: e.target.value }
-                })}
+                onChange={(e) =>
+                  updateStyle({
+                    colors: { ...style.colors, text: e.target.value },
+                  })
+                }
                 className="h-8 w-8 rounded border border-gray-300"
               />
               <input
                 type="text"
                 value={style.colors.text}
-                onChange={(e) => updateStyle({
-                  colors: { ...style.colors, text: e.target.value }
-                })}
+                onChange={(e) =>
+                  updateStyle({
+                    colors: { ...style.colors, text: e.target.value },
+                  })
+                }
                 className="flex-1 rounded-md border-gray-300 text-sm"
               />
             </div>
@@ -68,17 +84,21 @@ export function Toolbar({ onSave, isLoading }: ToolbarProps) {
               <input
                 type="color"
                 value={style.colors.background}
-                onChange={(e) => updateStyle({
-                  colors: { ...style.colors, background: e.target.value }
-                })}
+                onChange={(e) =>
+                  updateStyle({
+                    colors: { ...style.colors, background: e.target.value },
+                  })
+                }
                 className="h-8 w-8 rounded border border-gray-300"
               />
               <input
                 type="text"
                 value={style.colors.background}
-                onChange={(e) => updateStyle({
-                  colors: { ...style.colors, background: e.target.value }
-                })}
+                onChange={(e) =>
+                  updateStyle({
+                    colors: { ...style.colors, background: e.target.value },
+                  })
+                }
                 className="flex-1 rounded-md border-gray-300 text-sm"
               />
             </div>
@@ -87,10 +107,14 @@ export function Toolbar({ onSave, isLoading }: ToolbarProps) {
       </div>
 
       <div>
-        <h4 className="text-sm font-medium text-gray-900 mb-4">Spacing & Borders</h4>
+        <h4 className="text-sm font-medium text-gray-900 mb-4">
+          Spacing & Borders
+        </h4>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm text-gray-700">Section Spacing</label>
+            <label className="block text-sm text-gray-700">
+              Section Spacing
+            </label>
             <select
               value={style.spacing}
               onChange={(e) => updateStyle({ spacing: e.target.value as any })}
@@ -106,7 +130,9 @@ export function Toolbar({ onSave, isLoading }: ToolbarProps) {
             <label className="block text-sm text-gray-700">Border Radius</label>
             <select
               value={style.borderRadius}
-              onChange={(e) => updateStyle({ borderRadius: e.target.value as any })}
+              onChange={(e) =>
+                updateStyle({ borderRadius: e.target.value as any })
+              }
               className="mt-1 block w-full rounded-md border-gray-300"
             >
               <option value="none">None</option>
@@ -118,19 +144,25 @@ export function Toolbar({ onSave, isLoading }: ToolbarProps) {
         </div>
       </div>
     </div>
-  )
+  );
 
   const renderLayoutTab = () => (
     <div className="space-y-6">
-      {activeSection === 'header' && (
+      {activeSection === "header" && (
         <div>
-          <h4 className="text-sm font-medium text-gray-900 mb-4">Header Layout</h4>
+          <h4 className="text-sm font-medium text-gray-900 mb-4">
+            Header Layout
+          </h4>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm text-gray-700">Text Alignment</label>
+              <label className="block text-sm text-gray-700">
+                Text Alignment
+              </label>
               <select
                 value={content.header.alignment}
-                onChange={(e) => updateSection('header', { alignment: e.target.value })}
+                onChange={(e) =>
+                  updateSection("header", { alignment: e.target.value })
+                }
                 className="mt-1 block w-full rounded-md border-gray-300"
               >
                 <option value="left">Left</option>
@@ -139,11 +171,15 @@ export function Toolbar({ onSave, isLoading }: ToolbarProps) {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-700">Show Subtitle</label>
+              <label className="block text-sm text-gray-700">
+                Show Subtitle
+              </label>
               <input
                 type="checkbox"
                 checked={content.header.showSubtitle}
-                onChange={(e) => updateSection('header', { showSubtitle: e.target.checked })}
+                onChange={(e) =>
+                  updateSection("header", { showSubtitle: e.target.checked })
+                }
                 className="mt-1 rounded border-gray-300 text-blue-600"
               />
             </div>
@@ -151,15 +187,21 @@ export function Toolbar({ onSave, isLoading }: ToolbarProps) {
         </div>
       )}
 
-      {activeSection === 'features' && (
+      {activeSection === "features" && (
         <div>
-          <h4 className="text-sm font-medium text-gray-900 mb-4">Features Layout</h4>
+          <h4 className="text-sm font-medium text-gray-900 mb-4">
+            Features Layout
+          </h4>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm text-gray-700">Display Style</label>
+              <label className="block text-sm text-gray-700">
+                Display Style
+              </label>
               <select
                 value={content.features.layout}
-                onChange={(e) => updateSection('features', { layout: e.target.value })}
+                onChange={(e) =>
+                  updateSection("features", { layout: e.target.value })
+                }
                 className="mt-1 block w-full rounded-md border-gray-300"
               >
                 <option value="grid">Grid</option>
@@ -172,7 +214,9 @@ export function Toolbar({ onSave, isLoading }: ToolbarProps) {
               <input
                 type="checkbox"
                 checked={content.features.showIcons}
-                onChange={(e) => updateSection('features', { showIcons: e.target.checked })}
+                onChange={(e) =>
+                  updateSection("features", { showIcons: e.target.checked })
+                }
                 className="mt-1 rounded border-gray-300 text-blue-600"
               />
             </div>
@@ -180,15 +224,19 @@ export function Toolbar({ onSave, isLoading }: ToolbarProps) {
         </div>
       )}
 
-      {activeSection === 'form' && (
+      {activeSection === "form" && (
         <div>
-          <h4 className="text-sm font-medium text-gray-900 mb-4">Form Layout</h4>
+          <h4 className="text-sm font-medium text-gray-900 mb-4">
+            Form Layout
+          </h4>
           <div className="space-y-4">
             <div>
               <label className="block text-sm text-gray-700">Field Style</label>
               <select
                 value={content.form.fieldStyle}
-                onChange={(e) => updateSection('form', { fieldStyle: e.target.value })}
+                onChange={(e) =>
+                  updateSection("form", { fieldStyle: e.target.value })
+                }
                 className="mt-1 block w-full rounded-md border-gray-300"
               >
                 <option value="minimal">Minimal</option>
@@ -197,10 +245,14 @@ export function Toolbar({ onSave, isLoading }: ToolbarProps) {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-700">Button Width</label>
+              <label className="block text-sm text-gray-700">
+                Button Width
+              </label>
               <select
                 value={content.form.buttonWidth}
-                onChange={(e) => updateSection('form', { buttonWidth: e.target.value })}
+                onChange={(e) =>
+                  updateSection("form", { buttonWidth: e.target.value })
+                }
                 className="mt-1 block w-full rounded-md border-gray-300"
               >
                 <option value="full">Full Width</option>
@@ -211,12 +263,14 @@ export function Toolbar({ onSave, isLoading }: ToolbarProps) {
         </div>
       )}
     </div>
-  )
+  );
 
   const renderTypographyTab = () => (
     <div className="space-y-6">
       <div>
-        <h4 className="text-sm font-medium text-gray-900 mb-4">Font Settings</h4>
+        <h4 className="text-sm font-medium text-gray-900 mb-4">
+          Font Settings
+        </h4>
         <div className="space-y-4">
           <div>
             <label className="block text-sm text-gray-700">Font Family</label>
@@ -233,7 +287,7 @@ export function Toolbar({ onSave, isLoading }: ToolbarProps) {
         </div>
       </div>
     </div>
-  )
+  );
 
   return (
     <div className="w-96 border-l bg-white p-6 overflow-y-auto">
@@ -241,17 +295,17 @@ export function Toolbar({ onSave, isLoading }: ToolbarProps) {
         {/* Tabs */}
         <div className="flex gap-2 border-b border-gray-200">
           {[
-            { id: 'style', icon: Palette, label: 'Style' },
-            { id: 'layout', icon: Layout, label: 'Layout' },
-            { id: 'typography', icon: Type, label: 'Typography' }
-          ].map(tab => (
+            { id: "style", icon: Palette, label: "Style" },
+            { id: "layout", icon: Layout, label: "Layout" },
+            { id: "typography", icon: Type, label: "Typography" },
+          ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
               className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
                 activeTab === tab.id
-                  ? 'border-[#a47764] text-[#a47764]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? "border-[#a47764] text-[#a47764]"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -262,9 +316,9 @@ export function Toolbar({ onSave, isLoading }: ToolbarProps) {
 
         {/* Tab Content */}
         <div>
-          {activeTab === 'style' && renderStyleTab()}
-          {activeTab === 'layout' && renderLayoutTab()}
-          {activeTab === 'typography' && renderTypographyTab()}
+          {activeTab === "style" && renderStyleTab()}
+          {activeTab === "layout" && renderLayoutTab()}
+          {activeTab === "typography" && renderTypographyTab()}
         </div>
 
         {/* Save Button */}
@@ -282,5 +336,5 @@ export function Toolbar({ onSave, isLoading }: ToolbarProps) {
         </button>
       </div>
     </div>
-  )
+  );
 }

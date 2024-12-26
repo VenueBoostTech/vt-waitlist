@@ -34,6 +34,52 @@ model Client {
   platforms      String[]
 }
 
+model User {
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  email          String           @unique
+  password       String
+  subscription   SubscriptionTier @default(FREE)
+  companyName    String?
+  phone          String?
+  address        String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  waitlists      Waitlist[]       @relation("UserWaitlists")
+  supabaseId     String           @unique
+  platforms      String[]
+}
+
+model Waitlist {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  templateId    Int             
+  domain        String?         
+  subdomain     String?         
+  slug          String
+  spots_referral Int?
+  email_signups Boolean?        @default(false)
+  verify_email  Boolean?        @default(false)
+  customization Json?           
+  settings      Json?           
+  status        String          @default("active") 
+  content       Json?
+  style         Json?
+  client        Client          @relation(fields: [clientId], references: [id])
+  clientId      String          @db.ObjectId
+  user          User?           @relation("UserWaitlists", fields: [userId], references: [id])
+  userId        String?         @db.ObjectId
+  entries       WaitlistEntry[]
+  analytics     Analytics?      
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@unique([subdomain])
+  @@unique([domain])
+  @@unique([slug])
+}
+
+
 model BillingHistory {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   client    Client   @relation(fields: [clientId], references: [id])
@@ -44,30 +90,6 @@ model BillingHistory {
   plan      SubscriptionTier
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
-
-model Waitlist {
-  id            String          @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
-  templateId    Int             
-  domain        String?         
-  subdomain     String?         
-  slug          String          
-  customization Json?           
-  settings      Json?           
-  status        String          @default("active") 
-  content       Json?
-  style         Json?
-  client        Client          @relation(fields: [clientId], references: [id])
-  clientId      String          @db.ObjectId
-  entries       WaitlistEntry[]
-  analytics     Analytics?      
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-
-  @@unique([subdomain])
-  @@unique([domain])
-  @@unique([slug])
 }
 
 model WaitlistEntry {
@@ -116,3 +138,4 @@ model Template {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
