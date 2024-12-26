@@ -15,9 +15,9 @@ interface FormData {
     };
   };
   slug?: string;
-  spots_skipped_on_referral: number;
-  email_new_signups: boolean;
-  verify_signups_by_email: boolean;
+  spots_referral: number;
+  email_signups: boolean;
+  verify_email: boolean;
 }
 
 const validateSubdomain = (subdomain: string) => {
@@ -39,9 +39,9 @@ export default function WaitlistCreate() {
         primary: "#a47764",
       },
     },
-    spots_skipped_on_referral: 0,
-    email_new_signups: false,
-    verify_signups_by_email: false,
+    spots_referral: 0,
+    email_signups: false,
+    verify_email: false,
   });
 
   const handleSubdomainChange = (value: string) => {
@@ -186,11 +186,11 @@ export default function WaitlistCreate() {
             </label>
             <input
               type="number"
-              value={formData.spots_skipped_on_referral}
+              value={formData.spots_referral}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  spots_skipped_on_referral: Number(e.target.value),
+                  spots_referral: Number(e.target.value),
                 })
               }
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900"
@@ -203,12 +203,12 @@ export default function WaitlistCreate() {
             <div className="space-y-1 flex gap-1">
               <input
                 type="checkbox"
-                checked={formData.email_new_signups}
+                checked={formData.email_signups}
                 style={{ width: "16px", height: "16px" }}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    email_new_signups: e.target.checked,
+                    email_signups: e.target.checked,
                   })
                 }
                 className="mt-1"
@@ -221,12 +221,12 @@ export default function WaitlistCreate() {
             <div className="space-y-1 flex gap-1">
               <input
                 type="checkbox"
-                checked={formData.verify_signups_by_email}
+                checked={formData.verify_email}
                 style={{ width: "16px", height: "16px" }}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    verify_signups_by_email: e.target.checked,
+                    verify_email: e.target.checked,
                   })
                 }
                 className="mt-1"

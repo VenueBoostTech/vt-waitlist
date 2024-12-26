@@ -251,7 +251,7 @@ export default function WaitlistBuilderEdit({ id }: WaitlistBuilderEditProps) {
                 </span>
               </div>
               <div className="w-full aspect-[9/16] bg-gray-50 rounded-lg overflow-hidden">
-                {previewLoading ? (
+                {!previewLoading ? (
                   <div className="w-full h-full animate-pulse" />
                 ) : (
                   <iframe

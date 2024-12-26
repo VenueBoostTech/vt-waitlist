@@ -133,7 +133,7 @@ export function TemplateBuilder({ initialContent, onSave, onChange }: TemplateBu
         </div>
 
         {/* Toolbar */}
-        <Toolbar onSave={handleSave} isLoading={loading} />
+        <Toolbar onSave={handleSave} isLoading={loading} onChange={onChange} />
       </div>
     </BuilderProvider>
   )

@@ -128,7 +128,6 @@ export async function GET(req: Request) {
       }
     );
   } catch (error) {
-    console.log("🚀 ~ GET ~ error:", error)
     await prisma.$disconnect();
     return new NextResponse(
       JSON.stringify({ error: "Internal server error" }),
