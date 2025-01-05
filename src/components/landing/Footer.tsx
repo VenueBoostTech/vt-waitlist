@@ -13,6 +13,7 @@ const footerLinks = {
 }
 
 export function Footer() {
+  const currentYear = new Date().getFullYear()
   return (
     <footer className="bg-white border-t border-gray-200 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -45,7 +46,7 @@ export function Footer() {
         </div>
         <div className="mt-16 pt-8 border-t border-gray-200">
           <p className="text-gray-600 text-center">
-            © 2024 OmniStack LLC.
+            © {currentYear} OmniStack LLC.
           </p>
         </div>
       </div>
