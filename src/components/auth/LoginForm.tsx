@@ -1,7 +1,6 @@
-// components/auth/LoginForm.tsx
 "use client";
 
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -10,7 +9,6 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const supabase = createClientComponentClient();
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -18,25 +16,22 @@ export function LoginForm() {
     setError(null);
 
     const formData = new FormData(event.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const result = await signIn("credentials", {
+        email: formData.get("email"),
+        password: formData.get("password"),
+        redirect: false,
       });
 
-      if (error) {
-        throw error;
-      }
-
-      if (data?.session) {
-        router.push("/dashboard");
+      if (!result?.error) {
+        router.push('/dashboard');
         router.refresh();
+      } else {
+        setError(result.error);
       }
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Something went wrong");
+      setError("Something went wrong");
     } finally {
       setIsLoading(false);
     }
@@ -48,12 +43,14 @@ export function LoginForm() {
         <h1 className="text-2xl text-gray-700 font-semibold text-center mb-8">
           Sign In
         </h1>
+        {error && (
+          <div className="mb-4 p-3 text-sm text-red-600 bg-red-50 rounded-md border border-red-200">
+            {error}
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Email
             </label>
             <input
@@ -65,10 +62,7 @@ export function LoginForm() {
             />
           </div>
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
               Password
             </label>
             <input
@@ -79,7 +73,6 @@ export function LoginForm() {
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-[#a47764] focus:ring-[#a47764] sm:text-sm"
             />
           </div>
-          {error && <div className="text-red-500 text-sm">{error}</div>}
           <button
             type="submit"
             disabled={isLoading}
@@ -87,7 +80,6 @@ export function LoginForm() {
           >
             {isLoading ? "Signing in..." : "Sign in"}
           </button>
-
           <p className="text-center text-sm text-gray-600">
             Don't have an account?{" "}
             <Link href="/auth/register" className="text-gray-800 hover:underline">

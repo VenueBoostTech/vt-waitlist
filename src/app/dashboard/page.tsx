@@ -1,29 +1,61 @@
-// app/dashboard/page.tsx
+// src/app/dashboard/page.tsx
+import { Suspense } from 'react';
 import DashboardClient from "@/components/dashboard/DashboardContent";
-import { cookies } from "next/headers";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import prisma from "@/lib/prisma";
+
 export const metadata = {
   title: "Dashboard - OmniStack",
   description: "Manage your waitlists and view analytics",
 };
 
 async function getStats() {
-  const API_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const response = await fetch(`${API_URL}/api/dashboard`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Cookie: cookies().toString(),
-    },
-  });
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    return redirect("/auth/login");
   }
-  const data = await response.json();
+
   try {
-    const stats = data.data;
-    return stats;
+    const stats = await prisma.$transaction([
+      prisma.waitlist.count({
+        where: {
+          OR: [
+            { userId: session.user.id },
+            { clientId: session.user.id }
+          ]
+        }
+      }),
+      prisma.waitlistEntry.count({
+        where: {
+          waitlist: {
+            OR: [
+              { userId: session.user.id },
+              { clientId: session.user.id }
+            ]
+          }
+        }
+      }),
+      prisma.waitlist.count({
+        where: {
+          OR: [
+            { userId: session.user.id },
+            { clientId: session.user.id }
+          ],
+          status: "active"
+        }
+      })
+    ]);
+
+    return {
+      totalWaitlists: stats[0],
+      totalSubscribers: stats[1],
+      activeWaitlists: stats[2]
+    };
   } catch (error) {
-    console.error("Error fetching stats:", error);
+    console.error("Failed to fetch dashboard stats:", error);
     return {
       totalWaitlists: 0,
       totalSubscribers: 0,
@@ -33,7 +65,17 @@ async function getStats() {
 }
 
 export default async function DashboardPage() {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    redirect("/auth/login");
+  }
+
   const stats = await getStats();
 
-  return <DashboardClient initialStats={stats} />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DashboardClient initialStats={stats} />
+    </Suspense>
+  );
 }

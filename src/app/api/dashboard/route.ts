@@ -1,78 +1,59 @@
+// src/app/api/dashboard/route.ts
 import { NextResponse } from "next/server";
-import { PrismaClient, Prisma } from "@prisma/client";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 
-const prisma = new PrismaClient();
+export async function GET() {
+  const session = await getServerSession(authOptions);
 
-export async function GET(req: Request) {
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
-    const supabase = createRouteHandlerClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session?.user?.id) {
-      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    const client = await prisma.client.findUnique({
-      where: { supabaseId: session.user.id },
-    });
-
-    if (!client) {
-      return new NextResponse(JSON.stringify({ error: "Client not found" }), {
-        status: 404,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    const waitlists = await prisma.waitlist.findMany({
-      where: { clientId: client.id },
-      select: {
-        id: true,
-        status: true,
-      },
-    });
-    // Filter data base on status
-    const activeWaitlists = waitlists.filter(
-      (waitlist) => waitlist.status === "active"
-    );
-
-    const waitlistsEntry = await prisma.waitlistEntry.count({
-      where: {
-        waitlistId: {
-          in: waitlists.map((waitlist) => waitlist.id),
-        },
-      },
-    });
-    await prisma.$disconnect();
-
-    return new NextResponse(
-      JSON.stringify({
-        success: true,
-        data: {
-          totalWaitlists: waitlists.length,
-          totalSubscribers: waitlistsEntry,
-          activeWaitlists: activeWaitlists.length,
-        },
+    const stats = await prisma.$transaction([
+      prisma.waitlist.count({
+        where: {
+          OR: [
+            { userId: session.user.id },
+            { clientId: session.user.id }
+          ]
+        }
       }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
+      prisma.waitlistEntry.count({
+        where: {
+          waitlist: {
+            OR: [
+              { userId: session.user.id },
+              { clientId: session.user.id }
+            ]
+          }
+        }
+      }),
+      prisma.waitlist.count({
+        where: {
+          OR: [
+            { userId: session.user.id },
+            { clientId: session.user.id }
+          ],
+          status: "active"
+        }
+      })
+    ]);
+
+    return NextResponse.json({
+      data: {
+        totalWaitlists: stats[0],
+        totalSubscribers: stats[1],
+        activeWaitlists: stats[2]
       }
-    );
+    });
   } catch (error) {
-    await prisma.$disconnect();
-    return new NextResponse(
-      JSON.stringify({ error: "Internal server error" }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
+    console.error("Dashboard API error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
     );
   }
 }

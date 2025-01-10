@@ -1,29 +1,13 @@
 // middleware.ts
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { withAuth } from "next-auth/middleware"
 
-export async function middleware(req: NextRequest) {
-  const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  // If no session and trying to access protected routes
-  if (!session && req.nextUrl.pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/auth/login', req.url))
+// No custom middleware function needed - just the configuration
+export default withAuth({
+  pages: {
+    signIn: "/auth/login"
   }
-
-  // If session exists and trying to access auth pages
-  if (session && req.nextUrl.pathname.startsWith('/auth/')) {
-    return NextResponse.redirect(new URL('/dashboard', req.url))
-  }
-
-  return res
-}
+})
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/auth/:path*']
+  matcher: ["/dashboard/:path*"]
 }

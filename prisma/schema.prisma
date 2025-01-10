@@ -8,6 +8,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum UserRole {
+  ADMIN
+  SUPERADMIN
+}
+
 enum SubscriptionTier {
   FREE
   ADVANCED
@@ -32,6 +37,7 @@ model Client {
   billingHistory BillingHistory[] 
   supabaseId     String          @unique
   platforms      String[]
+  users          User[]
 }
 
 model User {
@@ -39,6 +45,7 @@ model User {
   name           String
   email          String           @unique
   password       String
+  role           UserRole         @default(ADMIN)
   subscription   SubscriptionTier @default(FREE)
   companyName    String?
   phone          String?
@@ -48,6 +55,8 @@ model User {
   waitlists      Waitlist[]       @relation("UserWaitlists")
   supabaseId     String           @unique
   platforms      String[]
+  client         Client?          @relation(fields: [clientId], references: [id])
+  clientId       String?          @db.ObjectId
 }
 
 model Waitlist {
