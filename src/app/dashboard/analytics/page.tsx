@@ -12,6 +12,7 @@ async function getStats() {
       Cookie: cookies().toString(),
     },
   });
+  
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }

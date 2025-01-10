@@ -28,7 +28,7 @@ export function HeaderSection() {
   }
 
   const getAlignmentClass = () => {
-    switch (headerContent.alignment) {
+    switch (headerContent?.alignment) {
       case 'center': return 'text-center'
       case 'right': return 'text-right'
       default: return 'text-left'
@@ -53,14 +53,14 @@ export function HeaderSection() {
           className="text-4xl font-bold tracking-tight"
           style={{ color: getTextColor() }}
         >
-          {headerContent.title || 'Add a title...'}
+          {headerContent?.title || 'Add a title...'}
         </h1>
-        {(headerContent.showSubtitle ?? true) && (
+        {(headerContent?.showSubtitle ?? true) && (
           <p 
             className="mt-4 text-xl"
             style={{ color: getTextColor(), opacity: 0.8 }}
           >
-            {headerContent.subtitle || 'Add a subtitle...'}
+            {headerContent?.subtitle || 'Add a subtitle...'}
           </p>
         )}
       </div>
@@ -74,15 +74,15 @@ export function HeaderSection() {
     >
       <input
         type="text"
-        value={headerContent.title}
+        value={headerContent?.title}
         onChange={(e) => updateSection('header', { title: e.target.value })}
         className="w-full text-4xl font-bold tracking-tight bg-transparent border-0 focus:ring-0 p-0 placeholder-gray-400"
         style={{ color: getTextColor() }}
         placeholder="Enter title..."
       />
-      {(headerContent.showSubtitle ?? true) && (
+      {(headerContent?.showSubtitle ?? true) && (
         <textarea
-          value={headerContent.subtitle}
+          value={headerContent?.subtitle}
           onChange={(e) => updateSection('header', { subtitle: e.target.value })}
           className="w-full mt-4 text-xl bg-transparent border-0 focus:ring-0 p-0 resize-none placeholder-gray-400"
           style={{ color: getTextColor(), opacity: 0.8 }}
