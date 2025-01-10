@@ -1,32 +1,30 @@
 // app/api/waitlist/[id]/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { authOptions } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
 export async function GET() {
-  const cookieStore = cookies();
-
   try {
-    // Create Supabase client
-    const supabase = createServerComponentClient({
-      cookies: () => cookieStore,
-    });
+    const session = await getServerSession(authOptions);
 
-    // Get session
-    const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.getSession();
-    if (sessionError || !session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user) {
+      return redirect("/auth/login");
+    }
+
+    if (!session?.user?.id) {
+      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Get client
     const client = await prisma.client.findUnique({
-      where: { supabaseId: session.user.id },
+      where: { id: session.user.id },
     });
 
     if (!client) {
@@ -37,33 +35,29 @@ export async function GET() {
       success: true,
       data: client,
     });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
 export async function PATCH(req: Request) {
-  const cookieStore = cookies();
-
   try {
-    // Create Supabase client
-    const supabase = createServerComponentClient({
-      cookies: () => cookieStore,
-    });
+    const session = await getServerSession(authOptions);
 
-    // Get session
-    const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.getSession();
+    if (!session?.user) {
+      return redirect("/auth/login");
+    }
 
-    if (sessionError || !session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user?.id) {
+      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Get client
     const client = await prisma.client.findUnique({
-      where: { supabaseId: session.user.id },
+      where: { id: session.user.id },
     });
 
     if (!client) {
@@ -96,7 +90,7 @@ export async function PATCH(req: Request) {
       success: true,
       data: {},
     });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

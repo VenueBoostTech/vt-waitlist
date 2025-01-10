@@ -186,7 +186,7 @@ export default function WaitlistCreate() {
             </label>
             <input
               type="number"
-              value={formData.spots_referral}
+              defaultValue={formData.spots_referral}
               onChange={(e) =>
                 setFormData({
                   ...formData,
