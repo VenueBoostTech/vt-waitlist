@@ -1,16 +1,18 @@
 import { NextResponse } from "next/server";
-import { PrismaClient, Prisma } from "@prisma/client";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { PrismaClient } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 const prisma = new PrismaClient();
 
 export async function GET(req: Request) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user) {
+      return redirect("/auth/login");
+    }
 
     if (!session?.user?.id) {
       return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
@@ -18,11 +20,10 @@ export async function GET(req: Request) {
         headers: { "Content-Type": "application/json" },
       });
     }
-
     const client = await prisma.client.findUnique({
-      where: { supabaseId: session.user.id },
+      where: { id: session.user.id },
     });
-
+    
     if (!client) {
       return new NextResponse(JSON.stringify({ error: "Client not found" }), {
         status: 404,
@@ -60,10 +61,13 @@ export async function GET(req: Request) {
     });
 
     const totalWaitlists = waitlistsEntrys.length;
-    const totalSubscribers = waitlistsEntrys.reduce((sum, waitlistsEntrys) => sum + waitlistsEntrys._count.entries, 0);
+    const totalSubscribers = waitlistsEntrys.reduce(
+      (sum, waitlistsEntrys) => sum + waitlistsEntrys._count.entries,
+      0
+    );
 
-    const averageSubscribers = totalWaitlists > 0 ? totalSubscribers / totalWaitlists : 0;
-
+    const averageSubscribers =
+      totalWaitlists > 0 ? totalSubscribers / totalWaitlists : 0;
 
     const totalRefferals = 0;
 
@@ -84,16 +88,24 @@ export async function GET(req: Request) {
     });
 
     const topWaitlists = waitlistsAnalytics.map((waitlist) => {
-      const { views, signups, dailyStats } = waitlist.analytics || { views: 0, signups: 0, dailyStats: null };
+      const { views, signups, dailyStats } = waitlist.analytics || {
+        views: 0,
+        signups: 0,
+        dailyStats: null,
+      };
       const subscribers = waitlist._count.entries;
 
-      const conversionRate = views > 0 ? ((subscribers / views) * 100).toFixed(1) : "0.0";
+      const conversionRate =
+        views > 0 ? ((subscribers / views) * 100).toFixed(1) : "0.0";
 
-      const stats : any = dailyStats ? dailyStats : null;
+      const stats: any = dailyStats ? dailyStats : null;
       const previousSignups = stats?.previousSignups || 0;
 
       // Calculate growth
-      const growth : number = previousSignups > 0 ? (((subscribers - previousSignups) / previousSignups) * 100) : 0.0;
+      const growth: number =
+        previousSignups > 0
+          ? ((subscribers - previousSignups) / previousSignups) * 100
+          : 0.0;
 
       return {
         name: waitlist.name,
@@ -106,8 +118,6 @@ export async function GET(req: Request) {
     // Sort by subscribers (or any criteria)
     topWaitlists.sort((a, b) => b.subscribers - a.subscribers);
 
-
-
     await prisma.$disconnect();
 
     return new NextResponse(
@@ -119,7 +129,7 @@ export async function GET(req: Request) {
           activeWaitlists: activeWaitlists.length,
           totalRefferals: totalRefferals,
           averageSubscribers: averageSubscribers,
-          topWaitlists: topWaitlists
+          topWaitlists: topWaitlists,
         },
       }),
       {
