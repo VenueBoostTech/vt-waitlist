@@ -44,9 +44,9 @@ async function main() {
   await prisma.client.deleteMany({})
 
   // Create users in Supabase first
-  const supabaseClientUser = await createSupabaseUser('demo-waitlist@omnistackhub.xyz', 'demo123!')
-  const supabaseAdminUser = await createSupabaseUser('admin-client@omnistackhub.xyz', 'admin123!')
-  const supabaseSuperAdminUser = await createSupabaseUser('superadmin+waitlist@omnistackhub.xyz', 'super123!')
+  // const supabaseClientUser = await createSupabaseUser('demo-waitlist@omnistackhub.xyz', 'demo123!')
+  // const supabaseAdminUser = await createSupabaseUser('admin-client@omnistackhub.xyz', 'admin123!')
+  // const supabaseSuperAdminUser = await createSupabaseUser('superadmin+waitlist@omnistackhub.xyz', 'super123!')
 
   // Create a dummy client
   const client = await prisma.client.create({
@@ -55,7 +55,7 @@ async function main() {
       email: "demo-waitlist@omnistackhub.xyz",
       password: await bcrypt.hash("demo123!", 10),
       companyName: "Demo Waitlist OS",
-      supabaseId: supabaseClientUser.id,
+      supabaseId: '910e4d69-09a9-4052-8227-8a301cbd94f5',
       subscription: SubscriptionTier.FREE,
       platforms: ["waitlist"],
       phone: "+1234567890",
@@ -70,7 +70,7 @@ async function main() {
       email: "admin-client@omnistackhub.xyz",
       password: await bcrypt.hash("admin123!", 10),
       role: UserRole.ADMIN,
-      supabaseId: supabaseAdminUser.id,
+      supabaseId: '6e2315cb-895c-4f00-9db1-4355df1888cd',
       subscription: SubscriptionTier.PRO,
       platforms: ["waitlist"],
       clientId: client.id,
@@ -87,7 +87,7 @@ async function main() {
       email: "superadmin+waitlist@omnistackhub.xyz",
       password: await bcrypt.hash("super123", 10),
       role: UserRole.SUPERADMIN,
-      supabaseId: supabaseSuperAdminUser.id,
+      supabaseId: '627f3c9b-4464-4fbd-94a3-ac7d89f840ad',
       subscription: SubscriptionTier.PRO,
       platforms: ["waitlist"]
     }

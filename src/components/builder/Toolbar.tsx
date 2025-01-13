@@ -8,9 +8,10 @@ interface ToolbarProps {
   onSave: () => Promise<void>;
   isLoading?: boolean;
   onChange?: (content: any) => void;
+  setContent?: (content: any) => void;
 }
 
-export function Toolbar({ onSave, isLoading, onChange }: ToolbarProps) {
+export function Toolbar({ onSave, isLoading, onChange, setContent }: ToolbarProps) {
   const { content, activeSection, style, updateSection, updateStyle } =
     useBuilder();
   const [activeTab, setActiveTab] = useState<"style" | "layout" | "typography">(
@@ -19,6 +20,13 @@ export function Toolbar({ onSave, isLoading, onChange }: ToolbarProps) {
 
   useEffect(() => {
     onChange?.(content);
+    // When style changes, update content with new style values
+    if (setContent) {
+      setContent({
+        ...content,
+        style
+      });
+    }
   }, [style]);
 
   const renderStyleTab = () => (
@@ -161,7 +169,9 @@ export function Toolbar({ onSave, isLoading, onChange }: ToolbarProps) {
               <select
                 value={content.header.alignment}
                 onChange={(e) =>
-                  updateSection("header", { alignment: e.target.value })
+                  updateSection("header", {
+                    alignment: e.target.value as any,
+                  })
                 }
                 className="mt-1 block w-full rounded-md border-gray-300"
               >
@@ -178,7 +188,9 @@ export function Toolbar({ onSave, isLoading, onChange }: ToolbarProps) {
                 type="checkbox"
                 checked={content.header.showSubtitle}
                 onChange={(e) =>
-                  updateSection("header", { showSubtitle: e.target.checked })
+                  updateSection("header", {
+                    showSubtitle: e.target.checked,
+                  })
                 }
                 className="mt-1 rounded border-gray-300 text-blue-600"
               />
@@ -200,7 +212,9 @@ export function Toolbar({ onSave, isLoading, onChange }: ToolbarProps) {
               <select
                 value={content.features.layout}
                 onChange={(e) =>
-                  updateSection("features", { layout: e.target.value })
+                  updateSection("features", {
+                    layout: e.target.value as any,
+                  })
                 }
                 className="mt-1 block w-full rounded-md border-gray-300"
               >
@@ -215,7 +229,9 @@ export function Toolbar({ onSave, isLoading, onChange }: ToolbarProps) {
                 type="checkbox"
                 checked={content.features.showIcons}
                 onChange={(e) =>
-                  updateSection("features", { showIcons: e.target.checked })
+                  updateSection("features", {
+                    showIcons: e.target.checked,
+                  })
                 }
                 className="mt-1 rounded border-gray-300 text-blue-600"
               />
@@ -235,7 +251,9 @@ export function Toolbar({ onSave, isLoading, onChange }: ToolbarProps) {
               <select
                 value={content.form.fieldStyle}
                 onChange={(e) =>
-                  updateSection("form", { fieldStyle: e.target.value })
+                  updateSection("form", {
+                    fieldStyle: e.target.value as any,
+                  })
                 }
                 className="mt-1 block w-full rounded-md border-gray-300"
               >
@@ -251,7 +269,9 @@ export function Toolbar({ onSave, isLoading, onChange }: ToolbarProps) {
               <select
                 value={content.form.buttonWidth}
                 onChange={(e) =>
-                  updateSection("form", { buttonWidth: e.target.value })
+                  updateSection("form", {
+                    buttonWidth: e.target.value as any,
+                  })
                 }
                 className="mt-1 block w-full rounded-md border-gray-300"
               >
