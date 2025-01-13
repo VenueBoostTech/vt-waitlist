@@ -10,7 +10,7 @@ import {
   ChevronUp,
   ChevronDown,
 } from "lucide-react";
-import type { Feature } from "../types";
+import type { Feature, HeaderContent } from "../types";
 
 interface SortableFeatureProps {
   feature: Feature;
@@ -40,6 +40,9 @@ function FeatureCard({
     transition,
     isDragging,
   } = useSortable({ id: feature.id });
+  const { content, activeSection, setActiveSection, updateSection } =
+    useBuilder();
+  const headerContent = content.header as HeaderContent;
 
   const getTextColor = () => style.colors.text;
   const getBorderRadiusClass = () => {
@@ -54,6 +57,17 @@ function FeatureCard({
         return "rounded-lg";
     }
   };
+  const getBackgroundColor = () => style.colors.background;
+  const getAlignmentClass = () => {
+    switch (headerContent?.alignment) {
+      case "center":
+        return "text-center";
+      case "right":
+        return "text-right";
+      default:
+        return "text-left";
+    }
+  };
 
   const sortableStyle = {
     transform: CSS.Transform.toString(transform),
@@ -65,8 +79,8 @@ function FeatureCard({
     return (
       <div
         ref={setNodeRef}
-        style={sortableStyle}
-        className={`bg-white p-6 ${getBorderRadiusClass()} shadow-sm hover:shadow-md transition-all`}
+        style={{ backgroundColor: getBackgroundColor() }}
+        className={`p-6 ${getBorderRadiusClass()} ${getAlignmentClass()} shadow-sm hover:shadow-md transition-all`}
       >
         <div className="flex items-center gap-4">
           {feature.icon && (
@@ -187,8 +201,13 @@ function FeatureCard({
 }
 
 export function FeaturesSection() {
-  const { content, style, activeSection, setActiveSection, updateSection } =
-    useBuilder();
+  const {
+    content,
+    style,
+    activeSection,
+    setActiveSection,
+    updateSection,
+  }: any = useBuilder();
   const features = content.features as Feature[];
   const isActive = activeSection === "features";
 

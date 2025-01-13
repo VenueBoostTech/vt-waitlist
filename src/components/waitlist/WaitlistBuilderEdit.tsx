@@ -3,15 +3,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import {
-  ChevronLeft,
-  Save,
-} from "lucide-react";
+import { ChevronLeft, Save } from "lucide-react";
 import { TemplateBuilder } from "@/components/builder/TemplateBuilder";
 import { formatDistanceToNow } from "date-fns";
 import { useToast } from "../../hooks/useToast";
 import { useSaveState } from "../../hooks/useSaveState";
-import { defaultTemplateContent } from "../../lib/defaultContent"; // Move template content to separate file
 import { ExitDialog } from "../../components/dialogs/ExitDialog";
 import { ShortcutsDialog } from "../../components/dialogs/ShortcutsDialog";
 
@@ -23,6 +19,7 @@ export default function WaitlistBuilderEdit({ id }: WaitlistBuilderEditProps) {
   const router = useRouter();
   const { addToast } = useToast();
   const { saveState, setSaving, setSuccess }: any = useSaveState();
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -72,6 +69,11 @@ export default function WaitlistBuilderEdit({ id }: WaitlistBuilderEditProps) {
 
       setSuccess("Changes saved successfully!");
       setHasUnsavedChanges(false);
+
+      // Refresh the iframe after successful save
+      if (iframeRef.current) {
+        iframeRef.current.src = iframeRef.current.src;
+      }
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to save changes";
@@ -234,7 +236,7 @@ export default function WaitlistBuilderEdit({ id }: WaitlistBuilderEditProps) {
           <main className="flex-1 overflow-y-auto pr-8">
             <div className="max-w-7xl mx-auto">
               <TemplateBuilder
-                initialContent={waitlist.content || defaultTemplateContent}
+                initialContent={waitlist.content}
                 onSave={handleSave}
                 onChange={handleContentUpdate}
               />
@@ -244,23 +246,24 @@ export default function WaitlistBuilderEdit({ id }: WaitlistBuilderEditProps) {
           {/* Preview Panel */}
           <aside className="hidden lg:block w-96 border-l bg-white overflow-y-auto p-6">
             {/* <div className="p-8"> */}
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-medium">Preview</h3>
-                <span className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-blue-50 text-[#a47764] cursor-pointer">
-                  Live
-                </span>
-              </div>
-              <div className="w-full aspect-[9/16] bg-gray-50 rounded-lg overflow-hidden">
-                {!previewLoading ? (
-                  <div className="w-full h-full animate-pulse" />
-                ) : (
-                  <iframe
-                    src={`/api/preview/${id}`}
-                    className="w-full h-full border-0"
-                    title="Page preview"
-                  />
-                )}
-              </div>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-medium">Preview</h3>
+              <span className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-blue-50 text-[#a47764] cursor-pointer">
+                Live
+              </span>
+            </div>
+            <div className="w-full aspect-[9/16] bg-gray-50 rounded-lg overflow-hidden">
+              {!previewLoading ? (
+                <div className="w-full h-full animate-pulse" />
+              ) : (
+                <iframe
+                  ref={iframeRef}
+                  src={`/api/preview/${id}`}
+                  className="w-full h-full border-0"
+                  title="Page preview"
+                />
+              )}
+            </div>
             {/* </div> */}
           </aside>
         </div>
