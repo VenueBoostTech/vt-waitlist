@@ -117,7 +117,7 @@ export function TemplateBuilder({
     >
       <div className="flex min-h-screen bg-gray-50">
         {/* Main Content Area */}
-        <div className="flex-1 pr-5 pl-1 pb-1 overflow-auto">
+        <div className="flex-1 pr-8 pl-1 pb-1 overflow-auto">
           <DndContext
             onDragEnd={handleDragEnd}
             collisionDetection={closestCenter}
