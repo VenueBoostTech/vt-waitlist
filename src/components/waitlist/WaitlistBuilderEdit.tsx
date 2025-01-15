@@ -233,19 +233,16 @@ export default function WaitlistBuilderEdit({ id }: WaitlistBuilderEditProps) {
 
         {/* Main content */}
         <div className="flex-1 flex overflow-hidden pt-8">
-          <main className="flex-1 overflow-y-auto pr-8">
-            <div className="max-w-7xl mx-auto">
-              <TemplateBuilder
-                initialContent={waitlist.content}
-                onSave={handleSave}
-                onChange={handleContentUpdate}
-              />
-            </div>
+          <main className="overflow-y-auto pr-5 w-3/5">
+            <TemplateBuilder
+              initialContent={waitlist.content}
+              onSave={handleSave}
+              onChange={handleContentUpdate}
+            />
           </main>
 
           {/* Preview Panel */}
-          <aside className="hidden lg:block w-96 border-l bg-white overflow-y-auto p-6">
-            {/* <div className="p-8"> */}
+          <aside className="hidden lg:block w-2/5 border-l bg-white p-6 flex-1">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-medium">Preview</h3>
               <span className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-blue-50 text-[#a47764] cursor-pointer">
@@ -264,7 +261,6 @@ export default function WaitlistBuilderEdit({ id }: WaitlistBuilderEditProps) {
                 />
               )}
             </div>
-            {/* </div> */}
           </aside>
         </div>
       </div>

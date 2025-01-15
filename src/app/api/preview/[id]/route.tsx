@@ -98,9 +98,8 @@ export async function GET(
               background-color: ${style.colors.background};
             }
             .container {
-              max-width: 800px;
+              max-width: 100%;
               margin: 0 auto;
-              padding: 2rem;
             }
             .header {
               text-align: ${content.header.alignment};
