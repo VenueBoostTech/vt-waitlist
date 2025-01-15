@@ -52,7 +52,7 @@ export function HeaderSection() {
       >
         {/* Edit Overlay */}
         <div className="absolute inset-0 bg-gray-900/0 group-hover:bg-gray-900/5 transition-colors rounded-lg flex items-center justify-center">
-          <span className="opacity-0 group-hover:opacity-100 transition-opacity text-sm font-medium text-gray-900">
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity text-sm font-medium text-gray-900/5">
             Click to edit
           </span>
         </div>
@@ -65,7 +65,7 @@ export function HeaderSection() {
         </h1>
         {(headerContent?.showSubtitle ?? true) && (
           <p
-            className="mt-4 text-xl"
+            className="mt-4 text-lg"
             style={{ color: getTextColor(), opacity: 0.8 }}
           >
             {headerContent?.subtitle || "Add a subtitle..."}

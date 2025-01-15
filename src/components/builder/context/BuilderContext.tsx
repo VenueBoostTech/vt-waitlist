@@ -64,7 +64,6 @@ export function BuilderProvider({
   }, [content]);
 
   const updateSection = (sectionId: string, data: any) => {
-    console.log("🚀 ~ updateSection ~ data:", data)
     setContent((prev: any) => ({
       ...prev,
       [sectionId]: data,

@@ -6,7 +6,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { BuilderProvider } from "./context/BuilderContext";
 import { HeaderSection } from "./sections/HeaderSection";
 import { FeaturesSection } from "./sections/FeaturesSection";

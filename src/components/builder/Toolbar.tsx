@@ -310,7 +310,7 @@ export function Toolbar({ onSave, isLoading, onChange, setContent }: ToolbarProp
   );
 
   return (
-    <div className="w-96 border-l bg-white p-6 overflow-y-auto">
+    <div className="w-1/2 border-l bg-white p-6 overflow-y-auto">
       <div className="space-y-6">
         {/* Tabs */}
         <div className="flex gap-2 border-b border-gray-200">
