@@ -1,6 +1,4 @@
 // app/dashboard/layout.tsx
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { getServerSession } from 'next-auth'

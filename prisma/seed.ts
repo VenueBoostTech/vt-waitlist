@@ -17,7 +17,7 @@ if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) 
 // Initialize Supabase client with the correct env variable name
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY  // Changed from SUPABASE_SERVICE_ROLE_KEY to SUPABASE_SERVICE_KEY
+  process.env.SUPABASE_SERVICE_KEY
 )
 
 async function createSupabaseUser(email: string, password: string) {

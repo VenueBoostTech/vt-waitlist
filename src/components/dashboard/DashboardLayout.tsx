@@ -4,8 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
-import { Menu, X, Home, List, ChartBar, Settings, CreditCard } from 'lucide-react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { Menu, X, Home, List, BarChart, Settings, CreditCard } from 'lucide-react'
+import { createBrowserClient } from '@supabase/ssr'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Waitlists', href: '/dashboard/waitlists', icon: List },
-  { name: 'Analytics', href: '/dashboard/analytics', icon: ChartBar },
+  { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
 ]
@@ -28,7 +28,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const pathname = usePathname()
   const router = useRouter()
-  const supabase = createClientComponentClient()
+  
+  // Updated Supabase client initialization
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
