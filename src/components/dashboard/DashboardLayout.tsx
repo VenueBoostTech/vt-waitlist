@@ -46,7 +46,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Header */}
       <header className="bg-white border-b h-16 fixed w-full top-0 z-50">
         <div className="flex items-center justify-between h-full px-4">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-1">
             <button 
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="p-2 rounded-lg text-gray-600 hover:bg-gray-100"
@@ -55,15 +55,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </button>
             <Link href="/dashboard" className="flex items-center">
               <Image
-                src="/images/logo/logo.svg"
-                alt="VisionTrack"
-                width={150}
+                src="/images/logo/waitlist-logo.svg"
+                alt="Waitlist"
+                width={110}
                 height={40}
               />
             </Link>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-1">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="relative h-8 w-8 rounded-full">

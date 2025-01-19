@@ -44,7 +44,7 @@ const mockSignups = [
 const AllSignups = ({ waitlist }: any) => {
   if (!waitlist) return null;
 
-  const waitlistUrl = `https://${waitlist.subdomain}.visiontrack.xyz`;
+  const waitlistUrl = `https://${waitlist.subdomain}.waitlist.omnistackhub.xyz`;
   const hasSignups = mockSignups.length > 0;
 
   if (!hasSignups) {

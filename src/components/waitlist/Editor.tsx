@@ -4,7 +4,7 @@ import React from "react";
 const Editor = ({ waitlist }: any) => {
   if (!waitlist) return null;
 
-  const waitlistUrl = `https://${waitlist.subdomain}.visiontrack.xyz`;
+  const waitlistUrl = `https://${waitlist.subdomain}.waitlist.omnistackhub.xyz`;
 
   return (
     <div className="flex flex-col gap-5 mt-5">

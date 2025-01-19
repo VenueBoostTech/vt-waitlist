@@ -168,7 +168,7 @@ export default function WaitlistCreate() {
                 maxLength={63}
               />
               <span className="px-4 py-3 bg-gray-50 border border-l-0 border-gray-300 rounded-r-lg text-gray-500">
-                .visiontrack.xyz
+                .waitlist.omnistackhub.xyz
               </span>
             </div>
             {subdomainError && (

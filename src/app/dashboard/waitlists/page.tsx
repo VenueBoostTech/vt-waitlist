@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import WaitlistContent from '@/components/waitlist/WaitlistContent'
 
 export const metadata: Metadata = {
-  title: 'Waitlists - OmniStack',
+  title: 'Waitlists - Waitlist OmniStack',
   description: 'Manage your waitlists'
 }
 
