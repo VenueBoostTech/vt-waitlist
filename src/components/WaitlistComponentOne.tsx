@@ -305,7 +305,6 @@ const handleJoin = async (e: React.FormEvent) => {
           alt="VisionTrack"
           width={150}
           height={40}
-          className="w-full"
         />
       </Link>
 
@@ -423,11 +422,11 @@ const handleJoin = async (e: React.FormEvent) => {
         <Image
           src={theme === 'dark' ? "/images/logo/logo-light.svg" : "/images/logo/logo.svg"}
           alt="VisionTrack"
-          width={250}
-          height={130}
+          width={150}
+          height={40}
         />
         <div className="text-sm text-[#6B7280] dark:text-gray-400">
-          © {new Date().getFullYear()} VisionTrack. All rights reserved.
+          © {new Date().getFullYear()} Waitlist OmniStack. All rights reserved.
         </div>
       </div>
     </footer>

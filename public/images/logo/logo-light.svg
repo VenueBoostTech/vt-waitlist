@@ -4,6 +4,6 @@
   <path d="M35 40 L55 20 L75 40 L55 60 Z" fill="#a47764"/>
   
   <!-- Wait (bold) and List (light gray) - slightly adjusted spacing -->
-  <text x="90" y="58" font-family="Arial, sans-serif" font-size="45" font-weight="700" fill="#000000">Wait</text>
+  <text x="90" y="58" font-family="Arial, sans-serif" font-size="45" font-weight="700" fill="#fff">Wait</text>
   <text x="185" y="58" font-family="Arial, sans-serif" font-size="45" font-weight="300" fill="#666666">List</text>
 </svg>
