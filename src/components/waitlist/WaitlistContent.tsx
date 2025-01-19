@@ -108,12 +108,12 @@ export default function WaitlistContent() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <a 
-                      href={`https://${waitlist.subdomain}.visiontrack.xyz`} 
+                      href={`https://${waitlist.subdomain}.waitlist.omnistackhub.xyz`} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-[#a47764] hover:text-[#b58775]"
                     >
-                      {waitlist.subdomain}.visiontrack.xyz
+                      {waitlist.subdomain}.waitlist.omnistackhub.xyz
                     </a>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

@@ -3,7 +3,7 @@ import WaitlistDetails from '@/components/waitlist/WaitlistDetails'
 
 // Metadata for the page
 export const metadata: Metadata = {
-  title: 'Waitlist Details - OmniStack',
+  title: 'Waitlist Details - Waitlist OmniStack',
   description: 'View and manage your waitlist'
 }
 

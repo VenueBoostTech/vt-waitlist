@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 40">
-    <text x="20" y="32"
-          font-family="Arial, sans-serif"
-          font-weight="700"
-          font-size="28px"
-          fill="#FFFFFF">
-        Vision<tspan fill="#FFFFFF">Track</tspan>
-    </text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 80">
+  <!-- Double chevrons -->
+  <path d="M10 40 L30 20 L50 40 L30 60 Z" fill="#a47764"/>
+  <path d="M35 40 L55 20 L75 40 L55 60 Z" fill="#a47764"/>
+  
+  <!-- Wait (bold) and List (light gray) - slightly adjusted spacing -->
+  <text x="90" y="58" font-family="Arial, sans-serif" font-size="45" font-weight="700" fill="#000000">Wait</text>
+  <text x="185" y="58" font-family="Arial, sans-serif" font-size="45" font-weight="300" fill="#666666">List</text>
 </svg>

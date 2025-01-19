@@ -3,7 +3,7 @@ import WaitlistComponentTemplateOne from '@/components/WaitlistComponentOne'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Template 1 - OmniStack',
+  title: 'Template 1 - Waitlist OmniStack',
   description: 'Template 1'
 }
 

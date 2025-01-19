@@ -3,7 +3,7 @@ import WaitlistBuilderEdit from '@/components/waitlist/WaitlistBuilderEdit'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Waitlist Builder - OmniStack',
+  title: 'Waitlist Builder - Waitlist OmniStack',
   description: 'Build your waitlist'
 }
 

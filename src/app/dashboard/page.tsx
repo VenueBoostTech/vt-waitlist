@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 
 export const metadata = {
-  title: "Dashboard - OmniStack",
+  title: "Dashboard - Waitlist OmniStack",
   description: "Manage your waitlists and view analytics",
 };
 
