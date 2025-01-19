@@ -1,7 +1,7 @@
 // app/api/test/create-client/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 
 const prisma = new PrismaClient();
