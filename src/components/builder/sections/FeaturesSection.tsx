@@ -40,7 +40,7 @@ function FeatureCard({
     transition,
     isDragging,
   } = useSortable({ id: feature.id });
-  const { content, activeSection, setActiveSection, updateSection } =
+  const { content } =
     useBuilder();
   const headerContent = content.header as HeaderContent;
 
@@ -213,7 +213,7 @@ export function FeaturesSection() {
 
   const getLayoutClass = () => {
     if (!isActive && style.layout === "grid") {
-      return "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
+      return "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4";
     }
     return "space-y-8";
   };

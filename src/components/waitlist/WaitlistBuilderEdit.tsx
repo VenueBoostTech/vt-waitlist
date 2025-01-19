@@ -16,7 +16,7 @@ type TabType = "edit" | "preview";
 export default function WaitlistBuilderEdit({ id }: { id: string }) {
   const router = useRouter();
   const { addToast } = useToast();
-  const { saveState, setSaving, setSuccess } = useSaveState();
+  const { saveState, setSaving, setSuccess }: any = useSaveState();
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const [activeTab, setActiveTab] = useState<TabType>("edit");
@@ -38,7 +38,8 @@ export default function WaitlistBuilderEdit({ id }: { id: string }) {
         const data = await response.json();
         setWaitlist(data.data);
       } catch (error) {
-        const message = error instanceof Error ? error.message : "Failed to load waitlist";
+        const message =
+          error instanceof Error ? error.message : "Failed to load waitlist";
         setError(message);
         addToast({ type: "error", message });
       } finally {
@@ -72,7 +73,8 @@ export default function WaitlistBuilderEdit({ id }: { id: string }) {
         iframeRef.current.src = iframeRef.current.src;
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to save changes";
+      const message =
+        error instanceof Error ? error.message : "Failed to save changes";
       setError(message);
       addToast({ type: "error", message });
     }
@@ -118,7 +120,10 @@ export default function WaitlistBuilderEdit({ id }: { id: string }) {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <p className="text-red-500 mb-4">{error}</p>
-          <Link href={`/dashboard/waitlists/${id}`} className="text-blue-600 hover:text-blue-700">
+          <Link
+            href={`/dashboard/waitlists/${id}`}
+            className="text-blue-600 hover:text-blue-700"
+          >
             Return to Waitlist
           </Link>
         </div>
@@ -152,7 +157,10 @@ export default function WaitlistBuilderEdit({ id }: { id: string }) {
               <div className="flex items-center gap-2">
                 {saveState.lastSaved && (
                   <span className="text-sm text-gray-500">
-                    Last saved {formatDistanceToNow(saveState.lastSaved, { addSuffix: true })}
+                    Last saved{" "}
+                    {formatDistanceToNow(saveState.lastSaved, {
+                      addSuffix: true,
+                    })}
                   </span>
                 )}
                 <button
@@ -218,11 +226,13 @@ export default function WaitlistBuilderEdit({ id }: { id: string }) {
       {/* Main content */}
       <div className="flex-1 overflow-hidden">
         {/* Edit Mode */}
-        <div className={`h-full transition-all duration-300 ${
-          activeTab === "edit" ? "block" : "hidden"
-        }`}>
+        <div
+          className={`h-full transition-all duration-300 ${
+            activeTab === "edit" ? "block" : "hidden"
+          }`}
+        >
           <div className="h-full p-8 overflow-y-auto">
-            <div className="max-w-4xl mx-auto">
+            <div className="mx-auto">
               <TemplateBuilder
                 initialContent={waitlist.content}
                 onSave={handleSave}
@@ -233,9 +243,11 @@ export default function WaitlistBuilderEdit({ id }: { id: string }) {
         </div>
 
         {/* Preview Mode */}
-        <div className={`h-full bg-white transition-all duration-300 ${
-          activeTab === "preview" ? "block" : "hidden"
-        }`}>
+        <div
+          className={`h-full bg-white transition-all duration-300 ${
+            activeTab === "preview" ? "block" : "hidden"
+          }`}
+        >
           <div className="h-full flex flex-col">
             <div className="flex-1">
               <iframe
@@ -260,7 +272,9 @@ export default function WaitlistBuilderEdit({ id }: { id: string }) {
         />
       )}
 
-      {showShortcuts && <ShortcutsDialog onClose={() => setShowShortcuts(false)} />}
+      {showShortcuts && (
+        <ShortcutsDialog onClose={() => setShowShortcuts(false)} />
+      )}
 
       {/* Save indicator */}
       {saveState.status === "saving" && (
