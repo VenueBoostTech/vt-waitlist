@@ -7,7 +7,7 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node prisma/stripe-price-seed.ts"
   },
   "dependencies": {
     "@auth/core": "^0.37.4",
@@ -43,6 +43,7 @@
     "react-hook-form": "^7.53.2",
     "recharts": "^2.15.0",
     "resend": "^4.0.1",
+    "stripe": "^17.5.0",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7"
   },
@@ -51,6 +52,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/stripe": "^8.0.417",
     "@types/uuid": "^10.0.0",
     "eslint": "^8",
     "eslint-config-next": "15.0.3",
