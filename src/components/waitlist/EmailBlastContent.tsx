@@ -14,10 +14,10 @@ const EmailBlastContent = () => {
   const variablesInfo = [
     "{priority}: 22",
     "{total_signups_currently}: 0",
-    "{referral_link}: https://visiontrack.xyz?ref_id=123456",
+    "{referral_link}: https://omnistackhub.xyz?ref_id=123456",
     "{waitlist_name}: gri-1",
-    "{waitlist_url_location}: https://visiontrack.xyz",
-    "{verification_link}: https://api.omnistack.xyz/verified?ver_id=12345"
+    "{waitlist_url_location}: https://omnistackhub.xyz",
+    "{verification_link}: https://api.omnistackhub.xyz/verified?ver_id=12345"
   ];
 
   const handleInputChange = (field, value) => {

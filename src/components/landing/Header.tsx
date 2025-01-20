@@ -1,6 +1,7 @@
 // components/landing/Header.tsx
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import Image from "next/image";
 
 const navigation = [
   { name: 'Features', href: '#features' },
@@ -16,10 +17,14 @@ export function Header() {
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
-              {/* Replace with your logo */}
-              <div className="text-[#a47764] font-bold text-2xl">OmniStack</div>
-            </Link>
+          <Link href="/">
+          <Image
+            src={"/images/logo/logo.svg"}
+            alt="OmniStack - Waitlist"
+            width={150}
+            height={40}
+          />
+        </Link>
           </div>
 
           <div className="hidden md:flex md:items-center md:space-x-6">

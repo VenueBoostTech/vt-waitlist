@@ -77,7 +77,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <DropdownMenuLabel>
                   <div className="flex flex-col">
                     <p className="text-sm font-medium text-gray-900">Griseld Gerveni</p>
-                    <p className="text-xs text-gray-500">info@visiontrack.xyz</p>
+                    <p className="text-xs text-gray-500">info@omnistackhub.xyz</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />

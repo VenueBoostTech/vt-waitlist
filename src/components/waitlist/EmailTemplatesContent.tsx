@@ -47,9 +47,9 @@ const EmailTemplatesContent = () => {
   const variablesInfo = [
     "{priority}: 22",
     "{total_signups_currently}: 0",
-    "{referral_link}: https://visiontrack.xyz?ref_id=123456",
+    "{referral_link}: https://omnistackhub.xyz?ref_id=123456",
     "{waitlist_name}: gri-1",
-    "{waitlist_url_location}: https://visiontrack.xyz",
+    "{waitlist_url_location}: https://omnistackhub.xyz",
     "{verification_link}: https://api.omnistack.xyz/verified?ver_id=12345"
   ];
 
@@ -69,11 +69,11 @@ const EmailTemplatesContent = () => {
                 Welcome! You are #22 out of 0 on the Waitlist. Share your unique referral link to move up in line:
               </p>
               <a href="#" className="text-blue-600 hover:text-blue-800">
-                https://visiontrack.xyz?ref_id=12345
+                https://omnistackhub.xyz?ref_id=12345
               </a>
               <p className="text-gray-600">You can check your status in line here:</p>
               <a href="#" className="text-blue-600 hover:text-blue-800">
-                https://visiontrack.xyz
+                https://omnistackhub.xyz
               </a>
             </>
           )
@@ -87,7 +87,7 @@ const EmailTemplatesContent = () => {
                 Well done! Someone signed up to gri-1 with your referral code. You are now #22 out of 0 on the Waitlist. Share your unique referral link to move up in line:
               </p>
               <a href="#" className="text-blue-600 hover:text-blue-800">
-                https://visiontrack.xyz?ref_id=12345
+                https://omnistackhub.xyz?ref_id=12345
               </a>
             </>
           )
