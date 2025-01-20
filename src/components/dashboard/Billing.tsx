@@ -501,7 +501,7 @@ return (
             </p>
             <div className="flex space-x-4">
               <a
-                href="mailto:support@visiontrack.xyz"
+                href="mailto:support@omnistackhub.xyz"
                 className="inline-flex items-center px-6 py-3 rounded-lg bg-[#a47764] text-white hover:bg-[#b58775] transition-colors duration-200"
               >
                 <Mail className="w-5 h-5 mr-2" />
