@@ -28,7 +28,7 @@ const SettingsContent = () => {
             </p>
             <input
               type="url"
-              defaultValue="https://visiontrack.xyz"
+              defaultValue="https://omnistackhub.xyz"
               className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764]"
             />
           </div>
