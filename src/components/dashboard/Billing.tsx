@@ -116,7 +116,8 @@ const transactionHistory = [
 ];
 
 export default function Billing() {
-  const { data: session } = useSession();
+  // disable session
+  // const { data: session } = useSession();
   const [loading, setLoading] = useState(true);
   const [prices, setPrices] = useState([]);
   const [currentSubscription, setCurrentSubscription] = useState(null);
@@ -198,10 +199,6 @@ const paginatedTransactions = transactionHistory.slice(startIndex, endIndex);
       setLoading(false);
     }
   };
-
-  // Split FAQs into two groups
-  const mainFaqs = faqs.slice(0, 4);
-  const additionalFaqs = faqs.slice(4);
 
   if (loading) {
     return (
