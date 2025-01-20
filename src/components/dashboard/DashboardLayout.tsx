@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
@@ -35,6 +35,36 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [user, setUser] = useState<any>(null);
+  console.log("🚀 ~ DashboardLayout ~ user:", user)
+
+  const getUser = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/client/me", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to get user");
+      }
+
+      const { data } = await response.json();
+      setUser(data);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  useEffect(() => {
+    getUser().then(() => {});
+  }, []);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -69,15 +99,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <button className="relative h-8 w-8 rounded-full">
                   <Avatar>
                     <AvatarImage src="/placeholder-avatar.jpg" alt="User" />
-                    <AvatarFallback className="bg-[#a47764] text-white">GG</AvatarFallback>
+                    <AvatarFallback className="bg-[#a47764] text-white">{user?.name?.charAt(0)}</AvatarFallback>
                   </Avatar>
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end">
                 <DropdownMenuLabel>
                   <div className="flex flex-col">
-                    <p className="text-sm font-medium text-gray-900">Griseld Gerveni</p>
-                    <p className="text-xs text-gray-500">info@omnistackhub.xyz</p>
+                    <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                    <p className="text-xs text-gray-500">{user?.email}</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
