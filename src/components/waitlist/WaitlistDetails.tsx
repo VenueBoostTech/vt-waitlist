@@ -274,7 +274,7 @@ export default function WaitlistDetails({ id }: { id: string }) {
           <AnalyticsContent />
         </Tab.Content>
         <Tab.Content value="email" className="mt-6">
-          <EmailContent />
+          <EmailContent waitlistId={waitlist.id} />
         </Tab.Content>  
         <Tab.Content value="automations" className="mt-6">
           <AutomationsContent />

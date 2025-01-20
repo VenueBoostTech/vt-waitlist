@@ -1,12 +1,150 @@
-import React, { useState } from "react";
+'use client';
+
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import * as Tab from "@radix-ui/react-tabs";
-import { Upload } from "lucide-react";
+import { Upload, AlertCircle, Check } from "lucide-react";
 import EmailTemplatesContent from "./EmailTemplatesContent";
 import EmailBlastContent from "./EmailBlastContent";
+import { useToast } from "@/hooks/useToast";
 
-const EmailContent = () => {
+interface EmailSettings {
+  emailNewSignups: boolean;
+  congratulateReferral: boolean;
+  customOffboarding: boolean;
+  removeHeader: boolean;
+  replyToEmail: string;
+  senderEmail: string;
+  senderName: string;
+  logo?: string;
+  domain?: string;
+  isDomainVerified: boolean;
+}
+
+const EmailContent = ({ waitlistId }: { waitlistId: string }) => {
   const [selectedEmailTab, setSelectedEmailTab] = useState("settings");
+  const [settings, setSettings] = useState<EmailSettings>({
+    emailNewSignups: true,
+    congratulateReferral: false,
+    customOffboarding: false,
+    removeHeader: false,
+    replyToEmail: "",
+    senderEmail: "",
+    senderName: "",
+    isDomainVerified: false,
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const { addToast } = useToast();
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    fetchEmailSettings();
+  }, [waitlistId]);
+
+  const fetchEmailSettings = async () => {
+    try {
+      const response = await fetch(`/api/waitlist/${waitlistId}/email-settings`);
+      if (!response.ok) throw new Error('Failed to fetch settings');
+      const data = await response.json();
+      setSettings(data);
+    } catch (error) {
+      addToast({
+        type: 'error',
+        message: 'Failed to load email settings'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSettingChange = async (key: keyof EmailSettings, value: boolean | string) => {
+    try {
+      setSaving(true);
+      const response = await fetch(`/api/waitlist/${waitlistId}/email-settings`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [key]: value }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update setting');
+
+      setSettings(prev => ({ ...prev, [key]: value }));
+      addToast({
+        type: 'success',
+        message: 'Settings updated successfully'
+      });
+    } catch (error) {
+      addToast({
+        type: 'error',
+        message: 'Failed to update settings'
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.length) return;
+    
+    try {
+      setUploadingLogo(true);
+      const file = e.target.files[0];
+      const formData = new FormData();
+      formData.append('logo', file);
+
+      const response = await fetch(`/api/waitlist/${waitlistId}/logo`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error('Failed to upload logo');
+
+      const { logoUrl } = await response.json();
+      setSettings(prev => ({ ...prev, logo: logoUrl }));
+      
+      addToast({
+        type: 'success',
+        message: 'Logo uploaded successfully'
+      });
+    } catch (error) {
+      addToast({
+        type: 'error',
+        message: 'Failed to upload logo'
+      });
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  const handleVerifyDomain = async () => {
+    try {
+      setSaving(true);
+      const response = await fetch(`/api/waitlist/${waitlistId}/verify-domain`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) throw new Error('Failed to verify domain');
+
+      setSettings(prev => ({ ...prev, isDomainVerified: true }));
+      addToast({
+        type: 'success',
+        message: 'Domain verified successfully'
+      });
+    } catch (error) {
+      addToast({
+        type: 'error',
+        message: 'Failed to verify domain'
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="p-6">Loading...</div>;
+  }
 
   return (
     <div>
@@ -57,102 +195,53 @@ const EmailContent = () => {
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-6">Sending Rules</h2>
               <div className="space-y-6">
-                {/* Email New Waiters */}
                 <div className="flex items-center justify-between">
                   <div>
                     <label className="block font-medium text-gray-900 mb-1">Email New Waiters</label>
                     <p className="text-sm text-gray-500">
-                      New Waiters on your Waitlist will receive an email containing their referral link and Waitlist status.
+                      New Waiters will receive an email with their referral link and status.
                     </p>
                   </div>
                   <input 
                     type="checkbox" 
-                    defaultChecked
+                    checked={settings.emailNewSignups}
+                    onChange={(e) => handleSettingChange('emailNewSignups', e.target.checked)}
+                    disabled={saving}
                     className="rounded border-gray-300 text-[#a47764] focus:ring-[#a47764]" 
                   />
                 </div>
 
-                {/* Congratulate on Referral */}
                 <div className="flex items-center justify-between">
                   <div>
                     <label className="block font-medium text-gray-900 mb-1">Congratulate on Referral</label>
                     <p className="text-sm text-gray-500">
-                      By turning this on, waiters will receive an email notification when they successfully refer others.
+                      Send email notifications for successful referrals.
                     </p>
                   </div>
                   <input 
                     type="checkbox" 
+                    checked={settings.congratulateReferral}
+                    onChange={(e) => handleSettingChange('congratulateReferral', e.target.checked)}
+                    disabled={saving}
                     className="rounded border-gray-300 text-[#a47764] focus:ring-[#a47764]" 
                   />
                 </div>
 
-                {/* Send Custom Offboarding Email */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="block font-medium text-gray-900 mb-1">Send Custom Offboarding Email</label>
+                    <label className="block font-medium text-gray-900 mb-1">Custom Offboarding Email</label>
                     <p className="text-sm text-gray-500">
-                      When you offboard a Waiter, send them an email. If enabled, you must customize this in the Email tab! Non-customized offboarding emails will not be sent.
+                      Send customized emails when offboarding users.
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <input 
                       type="checkbox" 
+                      checked={settings.customOffboarding}
+                      onChange={(e) => handleSettingChange('customOffboarding', e.target.checked)}
+                      disabled={true}
                       className="rounded border-gray-300 text-[#a47764] focus:ring-[#a47764]" 
                     />
-                    <span className="text-sm text-[#a47764] bg-[#a47764]/10 px-2 py-1 rounded">Upgrade</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Template Settings Section */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">Template Settings</h2>
-              <div className="space-y-6">
-                {/* Reply-to Email */}
-                <div>
-                  <label className="block font-medium text-gray-900 mb-1">Reply-to Email</label>
-                  <p className="text-sm text-gray-500 mb-2">
-                    If users respond to your custom email template or blast, this is where we send the email.
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="email"
-                      placeholder="signup_support@getwaitlist.com"
-                      disabled
-                      className="flex-1 border border-gray-200 rounded-lg px-4 py-2 bg-gray-50 text-gray-500"
-                    />
-                    <span className="text-sm text-[#a47764] bg-[#a47764]/10 px-2 py-1 rounded">Upgrade</span>
-                  </div>
-                </div>
-
-                {/* Remove Email Header */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="block font-medium text-gray-900 mb-1">Remove Email Header</label>
-                    <p className="text-sm text-gray-500">
-                      If checked, the email header (logo) will be completely removed from outgoing emails.
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <input 
-                      type="checkbox" 
-                      className="rounded border-gray-300 text-[#a47764] focus:ring-[#a47764]" 
-                    />
-                    <span className="text-sm text-[#a47764] bg-[#a47764]/10 px-2 py-1 rounded">Upgrade</span>
-                  </div>
-                </div>
-
-                {/* Logo Upload */}
-                <div>
-                  <label className="block font-medium text-gray-900 mb-1">Logo</label>
-                  <p className="text-sm text-gray-500 mb-2">
-                    Add a custom logo to the emails you send out
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <button className="px-4 py-2 border border-gray-200 rounded-lg text-gray-500 bg-gray-50">
-                      Upload Logo
-                    </button>
                     <span className="text-sm text-[#a47764] bg-[#a47764]/10 px-2 py-1 rounded">Upgrade</span>
                   </div>
                 </div>
@@ -163,45 +252,82 @@ const EmailContent = () => {
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-6">Custom Sender</h2>
               <div className="space-y-6">
-                {/* // TODO: do we need input here? */}
-                {/* Verify Domain Link */}
-                <div>
-                  <a href="#" className="text-[#a47764] hover:text-[#b58775] text-sm font-medium">
+                <div className="flex items-center gap-3">
+                  <a 
+                    onClick={handleVerifyDomain}
+                    className="inline-flex items-center text-[#a47764] hover:text-[#b58775] text-sm font-medium cursor-pointer"
+                  >
                     🔗 Verify your domain
                   </a>
+                  {settings.isDomainVerified && (
+                    <span className="inline-flex items-center text-sm text-green-600">
+                      <Check className="w-4 h-4 mr-1" />
+                      Verified
+                    </span>
+                  )}
                 </div>
 
-                {/* Sender Email */}
                 <div>
                   <label className="block font-medium text-gray-900 mb-1">Sender Email</label>
-                  <p className="text-sm text-gray-500 mb-2">
-                    Change the email address that your emails are sent from.
-                  </p>
                   <div className="flex items-center gap-2">
                     <input
                       type="email"
-                      placeholder="maya@getwaitlist.com"
-                      disabled
-                      className="flex-1 border border-gray-200 rounded-lg px-4 py-2 bg-gray-50 text-gray-500"
+                      value={settings.senderEmail}
+                      onChange={(e) => handleSettingChange('senderEmail', e.target.value)}
+                      placeholder="notifications@yourdomain.com"
+                      disabled={!settings.isDomainVerified}
+                      className="flex-1 border border-gray-200 rounded-lg px-4 py-2 disabled:bg-gray-50 disabled:text-gray-500"
                     />
-                    <span className="text-sm text-[#a47764] bg-[#a47764]/10 px-2 py-1 rounded">Upgrade</span>
+                    {!settings.isDomainVerified && (
+                      <span className="text-sm text-[#a47764] bg-[#a47764]/10 px-2 py-1 rounded">Upgrade</span>
+                    )}
                   </div>
                 </div>
 
-                {/* Sender Name */}
                 <div>
                   <label className="block font-medium text-gray-900 mb-1">Sender Name</label>
-                  <p className="text-sm text-gray-500 mb-2">
-                    Change the name that appears in the emails that are sent.
-                  </p>
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
-                      placeholder="Maya Kyler"
-                      disabled
-                      className="flex-1 border border-gray-200 rounded-lg px-4 py-2 bg-gray-50 text-gray-500"
+                      value={settings.senderName}
+                      onChange={(e) => handleSettingChange('senderName', e.target.value)}
+                      placeholder="Your Company Name"
+                      disabled={!settings.isDomainVerified}
+                      className="flex-1 border border-gray-200 rounded-lg px-4 py-2 disabled:bg-gray-50 disabled:text-gray-500"
                     />
-                    <span className="text-sm text-[#a47764] bg-[#a47764]/10 px-2 py-1 rounded">Upgrade</span>
+                    {!settings.isDomainVerified && (
+                      <span className="text-sm text-[#a47764] bg-[#a47764]/10 px-2 py-1 rounded">Upgrade</span>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-medium text-gray-900 mb-1">Logo</label>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleLogoUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <div className="flex items-center gap-4">
+                    {settings.logo ? (
+                      <img src={settings.logo} alt="Logo" className="h-12 w-12 object-contain rounded border border-gray-200" />
+                    ) : (
+                      <div className="h-12 w-12 flex items-center justify-center rounded border border-gray-200 bg-gray-50">
+                        <Upload className="w-5 h-5 text-gray-400" />
+                      </div>
+                    )}
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingLogo || !settings.isDomainVerified}
+                      className="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 disabled:bg-gray-50 disabled:text-gray-500"
+                    >
+                      {uploadingLogo ? 'Uploading...' : 'Upload Logo'}
+                    </button>
+                    {!settings.isDomainVerified && (
+                      <span className="text-sm text-[#a47764] bg-[#a47764]/10 px-2 py-1 rounded">Upgrade</span>
+                    )}
                   </div>
                 </div>
               </div>

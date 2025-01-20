@@ -1,6 +1,6 @@
 // prisma/seed.ts
-const { PrismaClient, UserRole, SubscriptionTier } = require('@prisma/client')
-const bcrypt = require('bcrypt')
+const { PrismaClient, UserRole } = require('@prisma/client')
+const bcrypt = require('bcryptjs')
 const { createClient } = require('@supabase/supabase-js')
 
 const prisma = new PrismaClient()
@@ -34,94 +34,103 @@ async function createSupabaseUser(email: string, password: string) {
   return user.user
 }
 
-async function main() {
-  // Clean up existing data
-  await prisma.waitlistEntry.deleteMany({})
-  await prisma.analytics.deleteMany({})
-  await prisma.waitlist.deleteMany({})
-  await prisma.billingHistory.deleteMany({})
-  await prisma.user.deleteMany({})
-  await prisma.client.deleteMany({})
 
-  // Create users in Supabase first
-  // const supabaseClientUser = await createSupabaseUser('demo-waitlist@omnistackhub.xyz', 'demo123!')
-  // const supabaseAdminUser = await createSupabaseUser('admin-client@omnistackhub.xyz', 'admin123!')
-  // const supabaseSuperAdminUser = await createSupabaseUser('superadmin+waitlist@omnistackhub.xyz', 'super123!')
+async function cleanDatabase() {
+  console.log('Cleaning invalid or conflicting subscriptions...');
+
+  // Delete subscriptions with null userId and clientId
+  await prisma.subscription.deleteMany({
+    where: { userId: null, clientId: null },
+  });
+
+  console.log('Database cleanup completed.');
+}
+
+async function main() {
+  // Clean invalid subscriptions
+  await cleanDatabase();
+
+  // Clear existing data
+  await prisma.waitlistEntry.deleteMany({});
+  await prisma.analytics.deleteMany({});
+  await prisma.waitlist.deleteMany({});
+  await prisma.billingHistory.deleteMany({});
+  await prisma.subscription.deleteMany({});
+  await prisma.user.deleteMany({});
+  await prisma.client.deleteMany({});
+
+  // Fetch free product and its price
+  const freeProduct = await prisma.product.findFirstOrThrow({
+    where: { name: 'Waitlist OmniStack - Free' },
+    include: { prices: { where: { interval: 'month' } } },
+  });
+
+  if (!freeProduct.prices[0]) {
+    throw new Error('No monthly price found for free product');
+  }
 
   // Create a dummy client
   const client = await prisma.client.create({
     data: {
-      name: "Demo Waitlist",
-      email: "demo-waitlist@omnistackhub.xyz",
-      password: await bcrypt.hash("demo123!", 10),
-      companyName: "Demo Waitlist OS",
+      name: 'Demo Waitlist',
+      email: 'demo-waitlist@omnistackhub.xyz',
+      password: await bcrypt.hash('demo123!', 10),
+      companyName: 'Demo Waitlist OS',
       supabaseId: '910e4d69-09a9-4052-8227-8a301cbd94f5',
-      subscription: SubscriptionTier.FREE,
-      platforms: ["waitlist"],
-      phone: "+1234567890",
-      address: "123 Demo Street"
-    }
-  })
+      platforms: ['waitlist'],
+      phone: '+1234567890',
+      address: '123 Demo Street',
+    },
+  });
 
-  // Create admin user connected to client
+  // Create an admin user linked to the client
   const adminUser = await prisma.user.create({
     data: {
-      name: "Admin Client",
-      email: "admin-client@omnistackhub.xyz",
-      password: await bcrypt.hash("admin123!", 10),
+      name: 'Admin Client',
+      email: 'admin-client@omnistackhub.xyz',
+      password: await bcrypt.hash('admin123!', 10),
       role: UserRole.ADMIN,
       supabaseId: '6e2315cb-895c-4f00-9db1-4355df1888cd',
-      subscription: SubscriptionTier.PRO,
-      platforms: ["waitlist"],
-      clientId: client.id,
-      companyName: "Demo Waitlist OS",
-      phone: "+1234567890",
-      address: "123 Demo Street"
-    }
-  })
+      platforms: ['waitlist'],
+      client: { connect: { id: client.id } },
+      companyName: 'Demo Waitlist OS',
+      phone: '+1234567890',
+      address: '123 Demo Street',
+    },
+  });
 
-  // Create superadmin user (not connected to any client)
+  // Create a superadmin user
   const superAdminUser = await prisma.user.create({
     data: {
-      name: "Super Admin",
-      email: "superadmin+waitlist@omnistackhub.xyz",
-      password: await bcrypt.hash("super123", 10),
+      name: 'Super Admin',
+      email: 'superadmin+waitlist@omnistackhub.xyz',
+      password: await bcrypt.hash('super123!', 10),
       role: UserRole.SUPERADMIN,
       supabaseId: '627f3c9b-4464-4fbd-94a3-ac7d89f840ad',
-      subscription: SubscriptionTier.PRO,
-      platforms: ["waitlist"]
-    }
-  })
+      platforms: ['waitlist'],
+    },
+  });
 
-  console.log({
-    message: "Seeding completed successfully",
+  // Create subscriptions for the client and users
+  await prisma.subscription.create({
     data: {
-      client: {
-        id: client.id,
-        email: client.email,
-        supabaseId: client.supabaseId
-      },
-      adminUser: {
-        id: adminUser.id,
-        email: adminUser.email,
-        role: adminUser.role,
-        supabaseId: adminUser.supabaseId
-      },
-      superAdminUser: {
-        id: superAdminUser.id,
-        email: superAdminUser.email,
-        role: superAdminUser.role,
-        supabaseId: superAdminUser.supabaseId
-      }
-    }
-  })
+      status: 'active',
+      product: { connect: { id: freeProduct.id } },
+      price: { connect: { id: freeProduct.prices[0].id } },
+      client: { connect: { id: client.id } },
+      user: { connect: { id: adminUser.id } },
+    },
+  });
+
+
+  console.log('Seeding completed successfully.');
 }
 
 main()
   .catch((e) => {
-    console.error("Error during seeding:", e)
-    process.exit(1)
+    console.error('Error during seeding:', e);
+    process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect()
-  })
+    await prisma.$disconnect();
+  });

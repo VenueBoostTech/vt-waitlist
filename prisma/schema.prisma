@@ -52,6 +52,7 @@ model Subscription {
   client       Client?   @relation("ClientSubscription", fields: [clientId], references: [id])
 }
 
+
 enum SubscriptionTier {
   FREE
   ADVANCED
@@ -98,6 +99,24 @@ model User {
   client         Client?          @relation(fields: [clientId], references: [id], onDelete: SetNull, onUpdate: NoAction)
 }
 
+model WaitlistEmailSettings {
+  id                  String    @id @default(auto()) @map("_id") @db.ObjectId
+  waitlistId          String    @unique @db.ObjectId
+  waitlist            Waitlist  @relation(fields: [waitlistId], references: [id])
+  emailNewSignups     Boolean   @default(true)
+  congratulateReferral Boolean  @default(false)
+  customOffboarding   Boolean   @default(false)
+  removeHeader        Boolean   @default(false)
+  replyToEmail       String?
+  senderEmail        String?
+  senderName         String?
+  logo               String?
+  domain             String?
+  isDomainVerified   Boolean    @default(false)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+}
+
 model Waitlist {
   id             String          @id @default(auto()) @map("_id") @db.ObjectId
   name           String
@@ -118,7 +137,8 @@ model Waitlist {
   userId         String?         @db.ObjectId
   user           User?           @relation("UserWaitlists", fields: [userId], references: [id])
   entries        WaitlistEntry[]
-  analytics      Analytics?      
+  analytics      Analytics?
+  emailSettings  WaitlistEmailSettings?      
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
