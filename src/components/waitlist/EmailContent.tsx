@@ -163,6 +163,7 @@ const EmailContent = () => {
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-6">Custom Sender</h2>
               <div className="space-y-6">
+                {/* // TODO: do we need input here? */}
                 {/* Verify Domain Link */}
                 <div>
                   <a href="#" className="text-[#a47764] hover:text-[#b58775] text-sm font-medium">
