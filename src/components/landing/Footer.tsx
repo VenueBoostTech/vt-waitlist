@@ -1,5 +1,7 @@
 // components/landing/Footer.tsx
 import Link from 'next/link'
+import Image from "next/image";
+
 
 const footerLinks = {
   'Waitlist': [
@@ -19,9 +21,14 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between">
           <div className="mb-8 md:mb-0">
-            <Link href="/" className="text-[#a47764] text-2xl font-bold">
-              OmniStack
-            </Link>
+          <Link href="/">
+          <Image
+            src={"/images/logo/logo.svg"}
+            alt="OmniStack - Waitlist"
+            width={150}
+            height={40}
+          />
+        </Link>
             <p className="mt-4 text-gray-600 max-w-xs">
               Viral pre-launch referral marketing software.
               Use your fans to launch the next big thing!
@@ -46,7 +53,7 @@ export function Footer() {
         </div>
         <div className="mt-16 pt-8 border-t border-gray-200">
           <p className="text-gray-600 text-center">
-            © {currentYear} OmniStack LLC.
+            © {currentYear} Waitlist OmniStack. All rights reserved.
           </p>
         </div>
       </div>
