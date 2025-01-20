@@ -117,7 +117,7 @@ const transactionHistory = [
 
 export default function Billing() {
   // disable session
-  // const { data: session } = useSession();
+  //const { data: session } = useSession();
   const [loading, setLoading] = useState(true);
   const [prices, setPrices] = useState([]);
   const [currentSubscription, setCurrentSubscription] = useState(null);
