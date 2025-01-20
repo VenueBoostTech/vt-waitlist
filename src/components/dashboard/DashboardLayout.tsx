@@ -24,47 +24,48 @@ const navigation = [
   { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
 ]
 
+const SIDEBAR_WIDTH = '200px'  // Reduced width
+const HEADER_HEIGHT = '64px'
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const pathname = usePathname()
   const router = useRouter()
   
-  // Updated Supabase client initialization
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [user, setUser] = useState<any>(null);
-  console.log("🚀 ~ DashboardLayout ~ user:", user)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const [user, setUser] = useState<any>(null)
 
   const getUser = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
       const response = await fetch("/api/client/me", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-      });
+      })
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to get user");
+        const data = await response.json()
+        throw new Error(data.error || "Failed to get user")
       }
 
-      const { data } = await response.json();
-      setUser(data);
+      const { data } = await response.json()
+      setUser(data)
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Something went wrong");
+      setError(error instanceof Error ? error.message : "Something went wrong")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
   
   useEffect(() => {
-    getUser().then(() => {});
-  }, []);
+    getUser()
+  }, [])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -72,9 +73,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-screen w-screen fixed overflow-hidden bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b h-16 fixed w-full top-0 z-50">
+      <header 
+        className="bg-white border-b fixed w-full top-0 z-50"
+        style={{ height: HEADER_HEIGHT }}
+      >
         <div className="flex items-center justify-between h-full px-4">
           <div className="flex items-center space-x-1">
             <button 
@@ -131,12 +135,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </header>
 
       {/* Sidebar */}
-      <div 
-        className={`fixed inset-y-0 left-0 transform ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } w-64 bg-white border-r transition-transform duration-200 ease-in-out pt-16 z-40`}
+      <aside 
+        className="fixed bg-white border-r transition-transform duration-200 ease-in-out z-40 overflow-y-auto"
+        style={{ 
+          width: SIDEBAR_WIDTH,
+          top: HEADER_HEIGHT,
+          bottom: 0,
+          transform: sidebarOpen ? 'translateX(0)' : `translateX(-${SIDEBAR_WIDTH})`,
+        }}
       >
-        <nav className="mt-6 px-4">
+        <nav className="mt-2 px-2">
           {navigation.map((item) => {
             const Icon = item.icon
             const isActive = pathname === item.href
@@ -151,17 +159,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                <Icon className="w-5 h-5 mr-3" />
+                <Icon className="w-5 h-5 mr-2" />
                 {item.name}
               </Link>
             )
           })}
         </nav>
-      </div>
+      </aside>
 
       {/* Main content */}
-      <main className={`pt-16 min-h-screen ${sidebarOpen ? 'pl-64' : ''} transition-all duration-200`}>
-        <div className="max-w-7xl mx-auto p-8">
+      <main 
+        className="absolute overflow-auto bg-gray-50"
+        style={{ 
+          top: HEADER_HEIGHT,
+          left: sidebarOpen ? SIDEBAR_WIDTH : '0',
+          right: '0',
+          bottom: '0',
+          transition: 'left 0.2s ease-in-out'
+        }}
+      >
+        <div className="min-h-full w-full max-w-[1400px] mx-auto p-6">
           {children}
         </div>
       </main>
