@@ -64,7 +64,7 @@ export function RegisterForm() {
 
   if (success) {
     return (
-      <div className="text-center p-8 bg-white rounded-lg shadow">
+      <div className="text-center p-8 bg-white rounded-lg shadow min-h-[60vh] py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center">
         <h2 className="text-2xl font-bold mb-4">Check your email</h2>
         <p className="text-gray-600">
           We've sent you a verification link. Please check your email to verify your account.
@@ -122,7 +122,7 @@ export function RegisterForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2 px-4 bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
+              className="w-full py-2 px-4 bg-[#a47764] hover:bg-[#b58775] text-white rounded-md disabled:opacity-50"
             >
               {loading ? 'Creating account...' : 'Create account'}
             </button>
