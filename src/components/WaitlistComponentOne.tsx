@@ -302,7 +302,7 @@ const handleJoin = async (e: React.FormEvent) => {
       <Link href="/">
         <Image
           src={theme === 'dark' ? "/images/logo/logo-light.svg" : "/images/logo/logo.svg"}
-          alt="VisionTrack"
+          alt="Waitlist OmniStack"
           width={150}
           height={40}
         />
@@ -421,7 +421,7 @@ const handleJoin = async (e: React.FormEvent) => {
       <div className="max-w-[1170px] mx-auto px-4 sm:px-8 xl:px-0 flex items-center justify-between">
         <Image
           src={theme === 'dark' ? "/images/logo/logo-light.svg" : "/images/logo/logo.svg"}
-          alt="VisionTrack"
+          alt="Waitlist OmniStack"
           width={150}
           height={40}
         />
