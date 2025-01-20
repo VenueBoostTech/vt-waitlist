@@ -11,7 +11,7 @@ export const VerificationEmail = ({
 }: VerificationEmailProps): ReactElement<JSXElementConstructor<any>> => (
   <html>
     <head>
-      <title>Verify your email for VisionTrack</title>
+      <title>Verify your email for Waitlist OmniStack</title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     </head>
     <body style={{ 
@@ -43,7 +43,7 @@ export const VerificationEmail = ({
             lineHeight: '1.25',
             margin: '0 0 24px'
           }}>
-            Welcome to VisionTrack!
+            Welcome to Waitlist OmniStack!
           </h1>
           
           <p style={{ 
