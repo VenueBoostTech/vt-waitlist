@@ -9,9 +9,9 @@ export const metadata: Metadata = {
 
 export default function SettingsPage() {
   return (
-    <div className="py-6 sm:px-6 lg:px-8">
+    <>
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">Account Settings</h1>
       <Settings />
-    </div>
+    </>
   )
 }
