@@ -104,7 +104,7 @@ export default function Settings() {
                 Account Information
               </h2>
               <span className="px-3 py-1 text-xs font-medium rounded-full bg-[#a47764] text-white">
-                {settings.subscription}
+                {settings.subscription ?? 'Free'}
               </span>
             </div>
 
@@ -119,7 +119,7 @@ export default function Settings() {
                   onChange={(e) =>
                     setSettings({ ...settings, name: e.target.value })
                   }
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900 text-sm"
                 />
               </div>
 
@@ -133,7 +133,7 @@ export default function Settings() {
                   onChange={(e) =>
                     setSettings({ ...settings, companyName: e.target.value })
                   }
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900 text-sm"
                 />
               </div>
 
@@ -148,7 +148,7 @@ export default function Settings() {
                   onChange={(e) =>
                     setSettings({ ...settings, email: e.target.value })
                   }
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900 text-sm"
                 />
               </div>
 
@@ -162,7 +162,7 @@ export default function Settings() {
                   onChange={(e) =>
                     setSettings({ ...settings, phone: e.target.value })
                   }
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900 text-sm"
                 />
               </div>
 
@@ -176,7 +176,7 @@ export default function Settings() {
                   onChange={(e) =>
                     setSettings({ ...settings, address: e.target.value })
                   }
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900 text-sm"
                 />
               </div>
             </div>
@@ -231,7 +231,7 @@ export default function Settings() {
                   onChange={(e) =>
                     setSettings({ ...settings, emailDigest: e.target.value })
                   }
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#a47764] focus:border-[#a47764] text-gray-900 text-sm"
                 >
                   <option value="daily">Daily</option>
                   <option value="weekly">Weekly</option>

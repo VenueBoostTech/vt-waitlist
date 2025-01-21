@@ -1,12 +1,13 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import * as Tab from "@radix-ui/react-tabs";
-import { Upload, AlertCircle, Check } from "lucide-react";
+import { Upload, Check } from "lucide-react";
 import EmailTemplatesContent from "./EmailTemplatesContent";
 import EmailBlastContent from "./EmailBlastContent";
 import { useToast } from "@/hooks/useToast";
+import { ToastContainer } from "../ui/toast";
 
 interface EmailSettings {
   emailNewSignups: boolean;
@@ -36,7 +37,7 @@ const EmailContent = ({ waitlistId }: { waitlistId: string }) => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
-  const { addToast } = useToast();
+  const { toasts, addToast, removeToast } = useToast();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -45,40 +46,48 @@ const EmailContent = ({ waitlistId }: { waitlistId: string }) => {
 
   const fetchEmailSettings = async () => {
     try {
-      const response = await fetch(`/api/waitlist/${waitlistId}/email-settings`);
-      if (!response.ok) throw new Error('Failed to fetch settings');
+      const response = await fetch(
+        `/api/waitlist/${waitlistId}/email-settings`
+      );
+      if (!response.ok) throw new Error("Failed to fetch settings");
       const data = await response.json();
       setSettings(data);
     } catch (error) {
       addToast({
-        type: 'error',
-        message: 'Failed to load email settings'
+        type: "error",
+        message: "Failed to load email settings",
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSettingChange = async (key: keyof EmailSettings, value: boolean | string) => {
+  const handleSettingChange = async (
+    key: keyof EmailSettings,
+    value: boolean | string
+  ) => {
     try {
       setSaving(true);
-      const response = await fetch(`/api/waitlist/${waitlistId}/email-settings`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ [key]: value }),
-      });
+      const response = await fetch(
+        `/api/waitlist/${waitlistId}/email-settings`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ [key]: value }),
+        }
+      );
 
-      if (!response.ok) throw new Error('Failed to update setting');
+      if (!response.ok) throw new Error("Failed to update setting");
 
-      setSettings(prev => ({ ...prev, [key]: value }));
+      setSettings((prev) => ({ ...prev, [key]: value }));
       addToast({
-        type: 'success',
-        message: 'Settings updated successfully'
+        type: "success",
+        message: "Settings updated successfully",
       });
     } catch (error) {
       addToast({
-        type: 'error',
-        message: 'Failed to update settings'
+        type: "error",
+        message: "Failed to update settings",
       });
     } finally {
       setSaving(false);
@@ -87,31 +96,31 @@ const EmailContent = ({ waitlistId }: { waitlistId: string }) => {
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.length) return;
-    
+
     try {
       setUploadingLogo(true);
       const file = e.target.files[0];
       const formData = new FormData();
-      formData.append('logo', file);
+      formData.append("logo", file);
 
       const response = await fetch(`/api/waitlist/${waitlistId}/logo`, {
-        method: 'POST',
+        method: "POST",
         body: formData,
       });
 
-      if (!response.ok) throw new Error('Failed to upload logo');
+      if (!response.ok) throw new Error("Failed to upload logo");
 
       const { logoUrl } = await response.json();
-      setSettings(prev => ({ ...prev, logo: logoUrl }));
-      
+      setSettings((prev) => ({ ...prev, logo: logoUrl }));
+
       addToast({
-        type: 'success',
-        message: 'Logo uploaded successfully'
+        type: "success",
+        message: "Logo uploaded successfully",
       });
     } catch (error) {
       addToast({
-        type: 'error',
-        message: 'Failed to upload logo'
+        type: "error",
+        message: "Failed to upload logo",
       });
     } finally {
       setUploadingLogo(false);
@@ -121,21 +130,30 @@ const EmailContent = ({ waitlistId }: { waitlistId: string }) => {
   const handleVerifyDomain = async () => {
     try {
       setSaving(true);
-      const response = await fetch(`/api/waitlist/${waitlistId}/verify-domain`, {
-        method: 'POST',
-      });
+      const response = await fetch(
+        `/api/waitlist/${waitlistId}/verify-domain`,
+        {
+          method: "POST",
+        }
+      );
 
-      if (!response.ok) throw new Error('Failed to verify domain');
-
-      setSettings(prev => ({ ...prev, isDomainVerified: true }));
-      addToast({
-        type: 'success',
-        message: 'Domain verified successfully'
-      });
+      if (!response.ok) {
+        const body = await response.json();
+        addToast({
+          type: "error",
+          message: body.error ?? "Failed to verify domain",
+        });
+      } else {
+        setSettings((prev) => ({ ...prev, isDomainVerified: true }));
+        addToast({
+          type: "success",
+          message: "Domain verified successfully",
+        });
+      }
     } catch (error) {
       addToast({
-        type: 'error',
-        message: 'Failed to verify domain'
+        type: "error",
+        message: "Failed to verify domain",
       });
     } finally {
       setSaving(false);
@@ -148,7 +166,11 @@ const EmailContent = ({ waitlistId }: { waitlistId: string }) => {
 
   return (
     <div>
-      <Tab.Root value={selectedEmailTab} onValueChange={setSelectedEmailTab} defaultValue="settings">
+      <Tab.Root
+        value={selectedEmailTab}
+        onValueChange={setSelectedEmailTab}
+        defaultValue="settings"
+      >
         {/* Email Subtabs Navigation */}
         <div className="flex items-center justify-between">
           <Tab.List className="flex bg-white border border-gray-200 rounded-lg overflow-hidden">
@@ -193,56 +215,79 @@ const EmailContent = ({ waitlistId }: { waitlistId: string }) => {
           <div className="space-y-8">
             {/* Sending Rules Section */}
             <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">Sending Rules</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-6">
+                Sending Rules
+              </h2>
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="block font-medium text-gray-900 mb-1">Email New Waiters</label>
+                    <label className="block font-medium text-gray-900 mb-1">
+                      Email New Waiters
+                    </label>
                     <p className="text-sm text-gray-500">
-                      New Waiters will receive an email with their referral link and status.
+                      New Waiters will receive an email with their referral link
+                      and status.
                     </p>
                   </div>
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={settings.emailNewSignups}
-                    onChange={(e) => handleSettingChange('emailNewSignups', e.target.checked)}
+                    onChange={(e) =>
+                      handleSettingChange("emailNewSignups", e.target.checked)
+                    }
                     disabled={saving}
-                    className="rounded border-gray-300 text-[#a47764] focus:ring-[#a47764]" 
+                    className="rounded border-gray-300 text-[#a47764] focus:ring-[#a47764]"
                   />
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="block font-medium text-gray-900 mb-1">Congratulate on Referral</label>
+                    <label className="block font-medium text-gray-900 mb-1">
+                      Congratulate on Referral
+                    </label>
                     <p className="text-sm text-gray-500">
                       Send email notifications for successful referrals.
                     </p>
                   </div>
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={settings.congratulateReferral}
-                    onChange={(e) => handleSettingChange('congratulateReferral', e.target.checked)}
+                    onChange={(e) =>
+                      handleSettingChange(
+                        "congratulateReferral",
+                        e.target.checked
+                      )
+                    }
                     disabled={saving}
-                    className="rounded border-gray-300 text-[#a47764] focus:ring-[#a47764]" 
+                    className="rounded border-gray-300 text-[#a47764] focus:ring-[#a47764]"
                   />
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="block font-medium text-gray-900 mb-1">Custom Offboarding Email</label>
+                    <label className="block font-medium text-gray-900 mb-1">
+                      Custom Offboarding Email
+                    </label>
                     <p className="text-sm text-gray-500">
                       Send customized emails when offboarding users.
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       checked={settings.customOffboarding}
-                      onChange={(e) => handleSettingChange('customOffboarding', e.target.checked)}
+                      onChange={(e) =>
+                        handleSettingChange(
+                          "customOffboarding",
+                          e.target.checked
+                        )
+                      }
                       disabled={true}
-                      className="rounded border-gray-300 text-[#a47764] focus:ring-[#a47764]" 
+                      className="rounded border-gray-300 text-[#a47764] focus:ring-[#a47764]"
                     />
-                    <span className="text-sm text-[#a47764] bg-[#a47764]/10 px-2 py-1 rounded">Upgrade</span>
+                    <span className="text-sm text-[#a47764] bg-[#a47764]/10 px-2 py-1 rounded">
+                      Upgrade
+                    </span>
                   </div>
                 </div>
               </div>
@@ -250,10 +295,12 @@ const EmailContent = ({ waitlistId }: { waitlistId: string }) => {
 
             {/* Custom Sender Section */}
             <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">Custom Sender</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-6">
+                Custom Sender
+              </h2>
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
-                  <a 
+                  <a
                     onClick={handleVerifyDomain}
                     className="inline-flex items-center text-[#a47764] hover:text-[#b58775] text-sm font-medium cursor-pointer"
                   >
@@ -268,41 +315,55 @@ const EmailContent = ({ waitlistId }: { waitlistId: string }) => {
                 </div>
 
                 <div>
-                  <label className="block font-medium text-gray-900 mb-1">Sender Email</label>
+                  <label className="block font-medium text-gray-900 mb-1">
+                    Sender Email
+                  </label>
                   <div className="flex items-center gap-2">
                     <input
                       type="email"
-                      value={settings.senderEmail}
-                      onChange={(e) => handleSettingChange('senderEmail', e.target.value)}
+                      value={settings.senderEmail || ""}
+                      onChange={(e) =>
+                        handleSettingChange("senderEmail", e.target.value)
+                      }
                       placeholder="notifications@yourdomain.com"
                       disabled={!settings.isDomainVerified}
                       className="flex-1 border border-gray-200 rounded-lg px-4 py-2 disabled:bg-gray-50 disabled:text-gray-500"
                     />
                     {!settings.isDomainVerified && (
-                      <span className="text-sm text-[#a47764] bg-[#a47764]/10 px-2 py-1 rounded">Upgrade</span>
+                      <span className="text-sm text-[#a47764] bg-[#a47764]/10 px-2 py-1 rounded">
+                        Upgrade
+                      </span>
                     )}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-medium text-gray-900 mb-1">Sender Name</label>
+                  <label className="block font-medium text-gray-900 mb-1">
+                    Sender Name
+                  </label>
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
-                      value={settings.senderName}
-                      onChange={(e) => handleSettingChange('senderName', e.target.value)}
+                      value={settings.senderName || ""}
+                      onChange={(e) =>
+                        handleSettingChange("senderName", e.target.value)
+                      }
                       placeholder="Your Company Name"
                       disabled={!settings.isDomainVerified}
                       className="flex-1 border border-gray-200 rounded-lg px-4 py-2 disabled:bg-gray-50 disabled:text-gray-500"
                     />
                     {!settings.isDomainVerified && (
-                      <span className="text-sm text-[#a47764] bg-[#a47764]/10 px-2 py-1 rounded">Upgrade</span>
+                      <span className="text-sm text-[#a47764] bg-[#a47764]/10 px-2 py-1 rounded">
+                        Upgrade
+                      </span>
                     )}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-medium text-gray-900 mb-1">Logo</label>
+                  <label className="block font-medium text-gray-900 mb-1">
+                    Logo
+                  </label>
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -312,7 +373,11 @@ const EmailContent = ({ waitlistId }: { waitlistId: string }) => {
                   />
                   <div className="flex items-center gap-4">
                     {settings.logo ? (
-                      <img src={settings.logo} alt="Logo" className="h-12 w-12 object-contain rounded border border-gray-200" />
+                      <img
+                        src={settings.logo}
+                        alt="Logo"
+                        className="h-12 w-12 object-contain rounded border border-gray-200"
+                      />
                     ) : (
                       <div className="h-12 w-12 flex items-center justify-center rounded border border-gray-200 bg-gray-50">
                         <Upload className="w-5 h-5 text-gray-400" />
@@ -323,10 +388,12 @@ const EmailContent = ({ waitlistId }: { waitlistId: string }) => {
                       disabled={uploadingLogo || !settings.isDomainVerified}
                       className="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 disabled:bg-gray-50 disabled:text-gray-500"
                     >
-                      {uploadingLogo ? 'Uploading...' : 'Upload Logo'}
+                      {uploadingLogo ? "Uploading..." : "Upload Logo"}
                     </button>
                     {!settings.isDomainVerified && (
-                      <span className="text-sm text-[#a47764] bg-[#a47764]/10 px-2 py-1 rounded">Upgrade</span>
+                      <span className="text-sm text-[#a47764] bg-[#a47764]/10 px-2 py-1 rounded">
+                        Upgrade
+                      </span>
                     )}
                   </div>
                 </div>
@@ -345,6 +412,7 @@ const EmailContent = ({ waitlistId }: { waitlistId: string }) => {
           <EmailBlastContent />
         </Tab.Content>
       </Tab.Root>
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 };
