@@ -125,7 +125,7 @@ export default function Billing() {
   const [loading, setLoading] = useState(true);
   const [prices, setPrices] = useState([]);
   const [currentSubscription, setCurrentSubscription] = useState<any>(null);
-  const [selectedInterval, setSelectedInterval] = useState("monthly");
+  const [selectedInterval, setSelectedInterval] = useState("month");
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   // Add these state variables to your component:
@@ -239,7 +239,7 @@ export default function Billing() {
             </div>
             <div className="flex space-x-3">
               <button
-                onClick={() => setSelectedInterval("monthly")}
+                onClick={() => setSelectedInterval("month")}
                 className={`px-3 py-1.5 rounded text-sm font-medium transition-all ${
                   selectedInterval === "month"
                     ? "bg-[#a47764] text-white"
@@ -251,7 +251,7 @@ export default function Billing() {
               <button
                 onClick={() => setSelectedInterval("yearly")}
                 className={`px-3 py-1.5 rounded text-sm font-medium transition-all flex items-center ${
-                  selectedInterval === "year"
+                  selectedInterval === "yearly"
                     ? "bg-[#a47764] text-white"
                     : "border text-gray-600 hover:border-[#a47764]"
                 }`}
@@ -341,7 +341,7 @@ export default function Billing() {
                         /{selectedInterval === "month" ? "mo" : "yr"}
                       </span>
                     </div>
-                    {selectedInterval === "year" && (
+                    {selectedInterval === "yearly" && (
                       <p className="mt-2 text-sm text-green-600 font-medium">
                         Save ${(price.amount * 12 * 0.2).toFixed(2)} per year
                       </p>
