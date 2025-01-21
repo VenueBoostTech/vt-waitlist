@@ -9,9 +9,8 @@ import {
   Mail,
   ArrowRight,
 } from "lucide-react";
-import { useToast } from '@/hooks/useToast';
-import { ToastContainer } from '@/components/ui/Toast';
-
+import { useToast } from "@/hooks/useToast";
+import { ToastContainer } from "../ui/toast";
 // Static plan features with more detail
 const planFeatures: any = {
   "Waitlist OmniStack - Free": {
@@ -186,14 +185,14 @@ export default function Billing() {
 
       const { url } = await response.json();
       if (!url) {
-        throw new Error('Failed to create checkout session');
+        throw new Error("Failed to create checkout session");
       }
       window.location.href = url;
     } catch (error) {
       console.error("Failed to create checkout session:", error);
       addToast({
-        type: 'error',
-        message: 'Failed to process upgrade. Please try again.'
+        type: "error",
+        message: "Failed to process upgrade. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -223,8 +222,8 @@ export default function Billing() {
   }
 
   return (
-    <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gray-50">
-      <div className="space-y-8">
+    <div className="bg-gray-50">
+      <div className="">
         {/* Page Header with Subscription Info */}
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="relative flex items-center justify-between p-4 border-b">
@@ -306,8 +305,6 @@ export default function Billing() {
               (p: any) =>
                 p.interval.toLowerCase() === selectedInterval.toLowerCase()
             );
-            console.log(price);
-            
             if (!price) return null;
 
             const isAdvanced = product.name.includes("Advanced");
@@ -317,7 +314,7 @@ export default function Billing() {
             return (
               <div
                 key={product.id}
-                className={`relative rounded-2xl bg-white transition-all duration-300 my-8 ${
+                className={`relative rounded-2xl bg-white transition-all duration-300 mt-14 ${
                   isAdvanced
                     ? "ring-2 ring-[#a47764] shadow-xl scale-105 border-0"
                     : "border border-gray-200 shadow-lg hover:shadow-xl"
@@ -329,7 +326,7 @@ export default function Billing() {
                   </div>
                 )}
 
-                <div className="p-8">
+                <div className="p-8 flex flex-col h-full">
                   {/* Plan Header */}
                   <div className="text-center mb-8">
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
@@ -352,7 +349,7 @@ export default function Billing() {
                   </div>
 
                   {/* Features */}
-                  <div className="space-y-4 mb-8">
+                  <div className="space-y-4 mb-8 flex-grow">
                     {featuresList.map((feature: string, i: number) => (
                       <div key={i} className="flex items-start">
                         <Check className="h-5 w-5 text-[#a47764] mr-3 mt-0.5 flex-shrink-0" />
@@ -362,33 +359,35 @@ export default function Billing() {
                   </div>
 
                   {/* Action Button */}
-                  <button
-                    onClick={() => handleUpgrade(price.stripePriceId)}
-                    disabled={
-                      loading || currentSubscription?.price?.id === price.id
-                    }
-                    className={`w-full py-4 rounded-lg font-medium transition-all ${
-                      currentSubscription?.price?.id === price.id
-                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                        : isAdvanced
-                          ? "bg-[#a47764] text-white hover:bg-[#b58775] shadow-md hover:shadow-lg"
-                          : "bg-white border-2 border-[#a47764] text-[#a47764] hover:bg-[#f8f5f4]"
-                    } disabled:opacity-50`}
-                  >
-                    {loading
-                      ? "Processing..."
-                      : currentSubscription?.price?.id === price.id
-                        ? "Current Plan"
-                        : product.name.includes("Free")
-                          ? "Get Started"
-                          : "Upgrade Now"}
-                  </button>
+                  <div className="mt-auto">
+                    <button
+                      onClick={() => handleUpgrade(price.stripePriceId)}
+                      disabled={
+                        loading || currentSubscription?.price?.id === price.id
+                      }
+                      className={`w-full py-4 rounded-lg font-medium transition-all ${
+                        currentSubscription?.price?.id === price.id
+                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          : isAdvanced
+                            ? "bg-[#a47764] text-white hover:bg-[#b58775] shadow-md hover:shadow-lg"
+                            : "bg-white border-2 border-[#a47764] text-[#a47764] hover:bg-[#f8f5f4]"
+                      } disabled:opacity-50`}
+                    >
+                      {loading
+                        ? "Processing..."
+                        : currentSubscription?.price?.id === price.id
+                          ? "Current Plan"
+                          : product.name.includes("Free")
+                            ? "Get Started"
+                            : "Upgrade Now"}
+                    </button>
 
-                  {product.name.includes("Free") && (
-                    <p className="mt-3 text-xs text-center text-gray-500">
-                      No credit card required
-                    </p>
-                  )}
+                    {product.name.includes("Free") && (
+                      <p className="mt-3 text-xs text-center text-gray-500">
+                        No credit card required
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             );
@@ -397,9 +396,9 @@ export default function Billing() {
       </div>
 
       {/* Enhanced FAQ and Transaction History Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
         {/* Left Column - Transaction History */}
-        <div className="bg-white rounded-2xl shadow-lg p-8">
+        <div className="bg-white rounded-2xl shadow-lg p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
             Transaction History
           </h2>
@@ -513,7 +512,7 @@ export default function Billing() {
         </div>
 
         {/* Right Column - FAQs */}
-        <div className="bg-white rounded-2xl shadow-lg p-8">
+        <div className="bg-white rounded-2xl shadow-lg p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
             Common Questions
           </h2>
@@ -547,7 +546,7 @@ export default function Billing() {
         </div>
       </div>
       {/* Support Banner */}
-      <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden mt-10">
+      <div className="bg-white rounded-2xl shadow-lg overflow-hidden mt-10">
         <div className="grid grid-cols-1 md:grid-cols-2">
           <div className="p-8 flex flex-col justify-center">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">
