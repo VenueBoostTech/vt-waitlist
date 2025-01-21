@@ -104,7 +104,7 @@ export default function Settings() {
                 Account Information
               </h2>
               <span className="px-3 py-1 text-xs font-medium rounded-full bg-[#a47764] text-white">
-                {settings.subscription}
+                {settings.subscription ?? 'Free'}
               </span>
             </div>
 

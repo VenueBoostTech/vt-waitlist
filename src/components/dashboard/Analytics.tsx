@@ -69,7 +69,7 @@ export default function Analytics({ stats }: { stats: any }) {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {stats?.topWaitlists?.map((waitlist) => (
+              {stats?.topWaitlists?.map((waitlist: any) => (
                 <tr key={`waitlist-${waitlist.id}`}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{waitlist.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{waitlist.subscribers}</td>
