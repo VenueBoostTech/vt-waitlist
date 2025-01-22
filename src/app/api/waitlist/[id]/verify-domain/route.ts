@@ -38,7 +38,7 @@ export async function POST(
 
     // Only allow domain verification for Advanced and Pro plans
     const productName = waitlist.client.subscription?.product.name || '';
-    if (!productName.includes('Advanced') && !productName.includes('Pro')) {
+    if (!productName.toLowerCase().includes('advanced') && !productName.toLowerCase().includes('pro')) {
       return NextResponse.json(
         { error: "Domain verification requires a paid plan" },
         { status: 403 }
