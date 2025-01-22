@@ -34,7 +34,7 @@ export async function POST(req: Request) {
         const { userId, priceId, productId } = session.metadata!;
 
         // Create or update subscription
-        await prisma.subscription.upsert({
+        const subscription = await prisma.subscription.upsert({
           where: { userId },
           update: {
             status: 'active',
@@ -46,6 +46,14 @@ export async function POST(req: Request) {
             priceId,
             productId,
             status: 'active'
+          }
+        });
+        await prisma.client.update({
+          where: { id: userId },
+          data: {
+            subscription: {
+              connect: { id: subscription.id }
+            }
           }
         });
         break;
