@@ -147,3 +147,46 @@ export async function PATCH(
     );
   }
 }
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const id = params.id;
+
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const waitlist = await prisma.$transaction(async (tx) => {
+        // Delete analytics records first
+        await tx.analytics.deleteMany({
+            where: { waitlistId: id }
+        });
+
+        // Delete the associated email settings
+        await tx.waitlistEmailSettings.deleteMany({
+            where: { waitlistId: id }
+        });
+
+        // Delete the waitlist settings
+        await tx.waitlistSettings.deleteMany({
+            where: { waitlistId: id }
+        });
+
+        // Finally delete the waitlist
+        return await tx.waitlist.delete({
+            where: { id: id },
+        });
+    });
+
+    return NextResponse.json(waitlist);
+  } catch (error) {
+    return NextResponse.json(
+        { error: 'Failed to delete waitlist' },
+        { status: 500 }
+    );
+  }
+}

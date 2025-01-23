@@ -52,7 +52,6 @@ model Subscription {
   client       Client?   @relation("ClientSubscription", fields: [clientId], references: [id])
 }
 
-
 enum SubscriptionTier {
   FREE
   ADVANCED
@@ -117,6 +116,35 @@ model WaitlistEmailSettings {
   updatedAt          DateTime   @updatedAt
 }
 
+model WaitlistSettings {
+  id                      String    @id @default(auto()) @map("_id") @db.ObjectId
+  waitlistId              String    @unique @db.ObjectId
+  waitlist                Waitlist  @relation(fields: [waitlistId], references: [id])
+  waitlistUrl             String    @default("https://omnistackhub.xyz")
+  waitlistName            String    @default("gri-1")
+  spotsSkippedOnReferral  String       @default("3")
+  hideSignupCount         Boolean   @default(false)
+  rankByReferrals         Boolean   @default(false)
+  closed                  Boolean   @default(false)
+  captchaEnabled          Boolean   @default(false)
+  hideReferralLink        Boolean   @default(false)
+  signupDataUpdate        Boolean   @default(false)
+  requiredSignupContact   String    @default("email")
+  requireName             Boolean   @default(false)
+  redirectOnSubmit        Boolean   @default(false)
+  redirectUrl             String    @default("")
+  emailNewSignups         Boolean   @default(true)
+  congratulateReferral    Boolean   @default(false)
+  customOffboarding       Boolean   @default(false)
+  leaderboard            Boolean   @default(false)
+  leaderboardSize        Int       @default(5)
+  customVerificationRedirect String?
+  domain                 String?
+  noFreePersonalEmails   Boolean   @default(false)
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+}
+
 model Waitlist {
   id             String          @id @default(auto()) @map("_id") @db.ObjectId
   name           String
@@ -139,6 +167,7 @@ model Waitlist {
   entries        WaitlistEntry[]
   analytics      Analytics?
   emailSettings  WaitlistEmailSettings?      
+  waitlistSettings WaitlistSettings?
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 

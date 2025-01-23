@@ -36,7 +36,7 @@ export async function POST(req: Request) {
         headers: { 'Content-Type': 'application/json' }
       }
     )
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating client:', error)
     
     // Check for duplicate key error
