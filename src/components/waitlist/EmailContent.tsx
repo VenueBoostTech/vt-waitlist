@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import * as Tab from "@radix-ui/react-tabs";
 import { Upload, Check } from "lucide-react";
@@ -39,6 +39,7 @@ const EmailContent = ({ waitlistId }: { waitlistId: string }) => {
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const { toasts, addToast, removeToast } = useToast();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const debounceTimerRef = React.useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     fetchEmailSettings();
@@ -62,7 +63,7 @@ const EmailContent = ({ waitlistId }: { waitlistId: string }) => {
     }
   };
 
-  const handleSettingChange = async (
+  const updateSetting = async (
     key: keyof EmailSettings,
     value: boolean | string
   ) => {
@@ -93,6 +94,24 @@ const EmailContent = ({ waitlistId }: { waitlistId: string }) => {
       setSaving(false);
     }
   };
+
+  const handleSettingChange = useCallback(
+    (key: keyof EmailSettings, value: boolean | string) => {
+      // Update UI immediately
+      setSettings((prev) => ({ ...prev, [key]: value }));
+
+      // Clear existing timer
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+
+      // Set new timer
+      debounceTimerRef.current = setTimeout(() => {
+        updateSetting(key, value);
+      }, 800);
+    },
+    []
+  );
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.length) return;
