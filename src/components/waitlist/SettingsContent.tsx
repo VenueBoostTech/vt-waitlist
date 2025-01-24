@@ -3,7 +3,16 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useToast } from "@/hooks/useToast";
 import { ToastContainer } from "../ui/toast";
-import router from "next/router";
+import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogOverlay,
+} from "../ui/dialog";
 
 interface WaitlistSettings {
   waitlistId: string;
@@ -59,6 +68,8 @@ const SettingsContent = ({ waitlistId }: { waitlistId: string }) => {
   const { toasts, addToast, removeToast } = useToast();
   const debounceTimerRef = React.useRef<NodeJS.Timeout>();
   const [isSubscription, setIsSubscription] = useState(false);
+  const router = useRouter();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     fetchWaitlistSettings();
@@ -125,6 +136,7 @@ const SettingsContent = ({ waitlistId }: { waitlistId: string }) => {
       );
 
       if (!response.ok) throw new Error("Failed to update setting");
+      fetchWaitlistSettings();
 
       addToast({
         type: "success",
@@ -158,15 +170,23 @@ const SettingsContent = ({ waitlistId }: { waitlistId: string }) => {
     []
   );
 
-  const handleDeleteWaitlist = async () => {
+  const handleDelete = async () => {
     try {
       const response = await fetch(`/api/waitlist/${waitlistId}`, {
         method: "DELETE",
       });
-      if (!response.ok) throw new Error("Failed to delete waitlist");
+
+      if (!response.ok) {
+        throw new Error("Failed to delete waitlist");
+      }
+
+      setIsDeleteModalOpen(false);
       router.push("/dashboard/waitlists");
     } catch (error) {
-      console.error("Error deleting waitlist:", error);
+      addToast({
+        type: "error",
+        message: "Failed to delete waitlist",
+      });
     }
   };
 
@@ -775,13 +795,42 @@ const SettingsContent = ({ waitlistId }: { waitlistId: string }) => {
             </div>
             <button
               className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-              onClick={handleDeleteWaitlist}
+              onClick={() => setIsDeleteModalOpen(true)}
             >
               Delete Waitlist
             </button>
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogOverlay className="fixed inset-0 bg-black/30" />
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Waitlist</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this waitlist? This action cannot
+              be undone and will permanently delete all associated data
+              including subscribers, analytics, and settings.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <button
+              className="px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 transition-colors"
+              onClick={() => setIsDeleteModalOpen(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+              onClick={handleDelete}
+            >
+              Delete
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
