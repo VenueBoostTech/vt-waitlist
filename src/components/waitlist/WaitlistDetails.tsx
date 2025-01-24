@@ -268,7 +268,7 @@ export default function WaitlistDetails({ id }: { id: string }) {
 
         {/* Other Tabs Content */}
         <Tab.Content value="settings" className="mt-6">
-          <SettingsContent />
+          <SettingsContent waitlistId={waitlist.id} />
         </Tab.Content>
         <Tab.Content value="analytics" className="mt-6">
           <AnalyticsContent />
