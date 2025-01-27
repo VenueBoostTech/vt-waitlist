@@ -278,12 +278,12 @@ export default function WaitlistSimpleEdit({ id }: WaitlistSimpleEditProps) {
                   <div className="flex items-center space-x-4">
                     <input
                       type="color"
-                      value={waitlist?.style?.colors?.primary}
+                      value={waitlist?.customization?.colors?.primary}
                       onChange={(e) => setWaitlist({
                         ...waitlist,
-                        style: {
-                          ...waitlist.style,
-                          colors: { ...waitlist.style.colors, primary: e.target.value }
+                        customization: {
+                          ...waitlist.customization,
+                          colors: { ...waitlist.customization.colors, primary: e.target.value }
                         }
                       })}
                       className="h-10 w-20 p-1 rounded-lg border border-gray-300 bg-white"
