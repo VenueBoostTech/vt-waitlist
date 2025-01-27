@@ -166,6 +166,7 @@ model Waitlist {
   user           User?           @relation("UserWaitlists", fields: [userId], references: [id])
   entries        WaitlistEntry[]
   analytics      Analytics?
+  signups        WaitlistSignups[]
   emailSettings  WaitlistEmailSettings?      
   waitlistSettings WaitlistSettings?
   createdAt      DateTime        @default(now())
@@ -233,4 +234,16 @@ model Template {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model WaitlistSignups {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  waitlistId  String   @db.ObjectId
+  waitlist    Waitlist @relation(fields: [waitlistId], references: [id])
+  email       String
+  name        String?
+  status      String   @default("verified")
+  referrals   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt 
 }
