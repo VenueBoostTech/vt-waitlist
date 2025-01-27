@@ -58,6 +58,7 @@ export async function POST(req: Request) {
       },
       status: "active",
       customization: body.customization || null,
+      content: body.content || null,
     };
     console.log(waitlistData);
     

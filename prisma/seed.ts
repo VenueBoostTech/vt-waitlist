@@ -47,83 +47,75 @@ async function cleanDatabase() {
 }
 
 async function main() {
-  // Clean invalid subscriptions
-  await cleanDatabase();
+  try {
+    console.log('Starting database cleanup...');
+    await cleanDatabase();
 
-  // Clear existing data
-  await prisma.waitlistEntry.deleteMany({});
-  await prisma.analytics.deleteMany({});
-  await prisma.waitlist.deleteMany({});
-  await prisma.billingHistory.deleteMany({});
-  await prisma.subscription.deleteMany({});
-  await prisma.user.deleteMany({});
-  await prisma.client.deleteMany({});
+    console.log('Fetching free product...');
+    const freeProduct = await prisma.product.findFirstOrThrow({
+      where: { name: 'Waitlist OmniStack - Free' },
+      include: { prices: { where: { interval: 'month' } } },
+    });
+    console.log('Found free product:', freeProduct);
 
-  // Fetch free product and its price
-  const freeProduct = await prisma.product.findFirstOrThrow({
-    where: { name: 'Waitlist OmniStack - Free' },
-    include: { prices: { where: { interval: 'month' } } },
-  });
+    if (!freeProduct.prices[0]) {
+      throw new Error('No monthly price found for free product');
+    }
 
-  if (!freeProduct.prices[0]) {
-    throw new Error('No monthly price found for free product');
+    console.log('Creating client...');
+    const client = await prisma.client.create({
+      data: {
+        name: 'Demo Waitlist',
+        email: 'demo-waitlist@omnistackhub.xyz',
+        password: await bcrypt.hash('demo123!', 10),
+        companyName: 'Demo Waitlist OS',
+        supabaseId: '910e4d69-09a9-4052-8227-8a301cbd94f5',
+        platforms: ['waitlist'],
+        phone: '+1234567890',
+        address: '123 Demo Street',
+      },
+    });
+    console.log('Created client:', client);
+
+    console.log('Creating admin user...');
+    const adminUser = await prisma.user.create({
+      data: {
+        name: 'Admin Client',
+        email: 'admin-client@omnistackhub.xyz',
+        password: await bcrypt.hash('admin123!', 10),
+        role: UserRole.ADMIN,
+        supabaseId: '6e2315cb-895c-4f00-9db1-4355df1888cd',
+        platforms: ['waitlist'],
+        client: { connect: { id: client.id } },
+        companyName: 'Demo Waitlist OS',
+        phone: '+1234567890',
+        address: '123 Demo Street',
+      },
+    });
+    console.log('Created admin user:', adminUser);
+
+    console.log('Creating subscription...');
+    const subscription = await prisma.subscription.create({
+      data: {
+        status: 'active',
+        product: { connect: { id: freeProduct.id } },
+        price: { connect: { id: freeProduct.prices[0].id } },
+        client: { connect: { id: client.id } },
+        user: { connect: { id: adminUser.id } },
+      },
+    });
+    console.log('Created subscription:', subscription);
+
+    console.log('Seeding completed successfully.');
+  } catch (error) {
+    console.error('Error during seeding:', error);
+    // Log more details about the error
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
+    throw error;
   }
-
-  // Create a dummy client
-  const client = await prisma.client.create({
-    data: {
-      name: 'Demo Waitlist',
-      email: 'demo-waitlist@omnistackhub.xyz',
-      password: await bcrypt.hash('demo123!', 10),
-      companyName: 'Demo Waitlist OS',
-      supabaseId: '910e4d69-09a9-4052-8227-8a301cbd94f5',
-      platforms: ['waitlist'],
-      phone: '+1234567890',
-      address: '123 Demo Street',
-    },
-  });
-
-  // Create an admin user linked to the client
-  const adminUser = await prisma.user.create({
-    data: {
-      name: 'Admin Client',
-      email: 'admin-client@omnistackhub.xyz',
-      password: await bcrypt.hash('admin123!', 10),
-      role: UserRole.ADMIN,
-      supabaseId: '6e2315cb-895c-4f00-9db1-4355df1888cd',
-      platforms: ['waitlist'],
-      client: { connect: { id: client.id } },
-      companyName: 'Demo Waitlist OS',
-      phone: '+1234567890',
-      address: '123 Demo Street',
-    },
-  });
-
-  // Create a superadmin user
-  const superAdminUser = await prisma.user.create({
-    data: {
-      name: 'Super Admin',
-      email: 'superadmin+waitlist@omnistackhub.xyz',
-      password: await bcrypt.hash('super123!', 10),
-      role: UserRole.SUPERADMIN,
-      supabaseId: '627f3c9b-4464-4fbd-94a3-ac7d89f840ad',
-      platforms: ['waitlist'],
-    },
-  });
-
-  // Create subscriptions for the client and users
-  await prisma.subscription.create({
-    data: {
-      status: 'active',
-      product: { connect: { id: freeProduct.id } },
-      price: { connect: { id: freeProduct.prices[0].id } },
-      client: { connect: { id: client.id } },
-      user: { connect: { id: adminUser.id } },
-    },
-  });
-
-
-  console.log('Seeding completed successfully.');
 }
 
 main()

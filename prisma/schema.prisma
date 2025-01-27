@@ -13,43 +13,43 @@ enum UserRole {
 }
 
 model Product {
-  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  id              String         @id @default(auto()) @map("_id") @db.ObjectId
   name            String
   description     String?
   taxCategory     String
-  stripeProductId String?         @unique
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  stripeProductId String?        @unique
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
   prices          Price[]
   subscriptions   Subscription[]
 }
 
 model Price {
-  id              String          @id @default(auto()) @map("_id") @db.ObjectId
-  amount          Float
-  currency        String          @default("USD")
-  interval        String
-  stripePriceId   String?         @unique
-  product         Product         @relation(fields: [productId], references: [id])
-  productId       String          @db.ObjectId
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  subscriptions   Subscription[]
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  amount        Float
+  currency      String         @default("USD")
+  interval      String
+  stripePriceId String?        @unique
+  product       Product        @relation(fields: [productId], references: [id])
+  productId     String         @db.ObjectId
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  subscriptions Subscription[]
 }
 
 model Subscription {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  status       String    @default("active")
-  productId    String    @db.ObjectId
-  product      Product   @relation(fields: [productId], references: [id])
-  priceId      String    @db.ObjectId
-  price        Price     @relation(fields: [priceId], references: [id])
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  userId       String?   @unique
-  user         User?     @relation("UserSubscription", fields: [userId], references: [id])
-  clientId     String?   @unique
-  client       Client?   @relation("ClientSubscription", fields: [clientId], references: [id])
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  status    String   @default("active")
+  productId String   @db.ObjectId
+  product   Product  @relation(fields: [productId], references: [id])
+  priceId   String   @db.ObjectId
+  price     Price    @relation(fields: [priceId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String?  @unique
+  user      User?    @relation("UserSubscription", fields: [userId], references: [id])
+  clientId  String?  @unique
+  client    Client?  @relation("ClientSubscription", fields: [clientId], references: [id])
 }
 
 enum SubscriptionTier {
@@ -80,96 +80,97 @@ model Client {
 }
 
 model User {
-  id             String           @id @default(auto()) @map("_id") @db.ObjectId
-  name           String
-  email          String           @unique
-  password       String
-  role           UserRole         @default(ADMIN)
-  subscription   Subscription?    @relation("UserSubscription")
-  companyName    String?
-  phone          String?
-  address        String?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  waitlists      Waitlist[]       @relation("UserWaitlists")
-  supabaseId     String           @unique
-  platforms      String[]
-  clientId       String?          @db.ObjectId
-  client         Client?          @relation(fields: [clientId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  email        String        @unique
+  password     String
+  role         UserRole      @default(ADMIN)
+  subscription Subscription? @relation("UserSubscription")
+  companyName  String?
+  phone        String?
+  address      String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  waitlists    Waitlist[]    @relation("UserWaitlists")
+  supabaseId   String        @unique
+  platforms    String[]
+  clientId     String?       @db.ObjectId
+  client       Client?       @relation(fields: [clientId], references: [id], onDelete: SetNull, onUpdate: NoAction)
 }
 
 model WaitlistEmailSettings {
-  id                  String    @id @default(auto()) @map("_id") @db.ObjectId
-  waitlistId          String    @unique @db.ObjectId
-  waitlist            Waitlist  @relation(fields: [waitlistId], references: [id])
-  emailNewSignups     Boolean   @default(true)
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  waitlistId           String   @unique @db.ObjectId
+  waitlist             Waitlist @relation(fields: [waitlistId], references: [id])
+  emailNewSignups      Boolean  @default(true)
   congratulateReferral Boolean  @default(false)
-  customOffboarding   Boolean   @default(false)
-  removeHeader        Boolean   @default(false)
-  replyToEmail       String?
-  senderEmail        String?
-  senderName         String?
-  logo               String?
-  domain             String?
-  isDomainVerified   Boolean    @default(false)
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
+  customOffboarding    Boolean  @default(false)
+  removeHeader         Boolean  @default(false)
+  replyToEmail         String?
+  senderEmail          String?
+  senderName           String?
+  logo                 String?
+  domain               String?
+  isDomainVerified     Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 }
 
 model WaitlistSettings {
-  id                      String    @id @default(auto()) @map("_id") @db.ObjectId
-  waitlistId              String    @unique @db.ObjectId
-  waitlist                Waitlist  @relation(fields: [waitlistId], references: [id])
-  waitlistUrl             String    @default("https://omnistackhub.xyz")
-  waitlistName            String    @default("gri-1")
-  spotsSkippedOnReferral  String       @default("3")
-  hideSignupCount         Boolean   @default(false)
-  rankByReferrals         Boolean   @default(false)
-  closed                  Boolean   @default(false)
-  captchaEnabled          Boolean   @default(false)
-  hideReferralLink        Boolean   @default(false)
-  signupDataUpdate        Boolean   @default(false)
-  requiredSignupContact   String    @default("email")
-  requireName             Boolean   @default(false)
-  redirectOnSubmit        Boolean   @default(false)
-  redirectUrl             String    @default("")
-  emailNewSignups         Boolean   @default(true)
-  congratulateReferral    Boolean   @default(false)
-  customOffboarding       Boolean   @default(false)
-  leaderboard            Boolean   @default(false)
-  leaderboardSize        Int       @default(5)
+  id                         String   @id @default(auto()) @map("_id") @db.ObjectId
+  waitlistId                 String   @unique @db.ObjectId
+  waitlist                   Waitlist @relation(fields: [waitlistId], references: [id])
+  waitlistUrl                String   @default("https://omnistackhub.xyz")
+  waitlistName               String   @default("gri-1")
+  spotsSkippedOnReferral     String   @default("3")
+  hideSignupCount            Boolean  @default(false)
+  rankByReferrals            Boolean  @default(false)
+  closed                     Boolean  @default(false)
+  captchaEnabled             Boolean  @default(false)
+  hideReferralLink           Boolean  @default(false)
+  signupDataUpdate           Boolean  @default(false)
+  requiredSignupContact      String   @default("email")
+  requireName                Boolean  @default(false)
+  redirectOnSubmit           Boolean  @default(false)
+  redirectUrl                String   @default("")
+  emailNewSignups            Boolean  @default(true)
+  congratulateReferral       Boolean  @default(false)
+  customOffboarding          Boolean  @default(false)
+  leaderboard                Boolean  @default(false)
+  leaderboardSize            Int      @default(5)
   customVerificationRedirect String?
-  domain                 String?
-  noFreePersonalEmails   Boolean   @default(false)
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt
+  domain                     String?
+  noFreePersonalEmails       Boolean  @default(false)
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
 }
 
 model Waitlist {
-  id             String          @id @default(auto()) @map("_id") @db.ObjectId
-  name           String
-  templateId     Int             
-  domain         String?         
-  subdomain      String?         
-  slug           String
-  spots_referral Int?
-  email_signups  Boolean?        @default(false)
-  verify_email   Boolean?        @default(false)
-  customization  Json?           
-  settings       Json?           
-  status         String          @default("active") 
-  content        Json?
-  style          Json?
-  clientId       String          @db.ObjectId
-  client         Client          @relation(fields: [clientId], references: [id])
-  userId         String?         @db.ObjectId
-  user           User?           @relation("UserWaitlists", fields: [userId], references: [id])
-  entries        WaitlistEntry[]
-  analytics      Analytics?
-  emailSettings  WaitlistEmailSettings?      
+  id               String                 @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  templateId       Int
+  domain           String?
+  subdomain        String?
+  slug             String
+  spots_referral   Int?
+  email_signups    Boolean?               @default(false)
+  verify_email     Boolean?               @default(false)
+  customization    Json?
+  settings         Json?
+  status           String                 @default("active")
+  content          Json?
+  style            Json?
+  clientId         String                 @db.ObjectId
+  client           Client                 @relation(fields: [clientId], references: [id])
+  userId           String?                @db.ObjectId
+  user             User?                  @relation("UserWaitlists", fields: [userId], references: [id])
+  entries          WaitlistEntry[]
+  analytics        Analytics?
+  signups          WaitlistSignups[]
+  emailSettings    WaitlistEmailSettings?
   waitlistSettings WaitlistSettings?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
 
   @@unique([subdomain])
   @@unique([domain])
@@ -177,33 +178,33 @@ model Waitlist {
 }
 
 model BillingHistory {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  clientId  String   @db.ObjectId
-  client    Client   @relation(fields: [clientId], references: [id])
+  id        String           @id @default(auto()) @map("_id") @db.ObjectId
+  clientId  String           @db.ObjectId
+  client    Client           @relation(fields: [clientId], references: [id])
   amount    Float
-  currency  String   @default("USD")
-  status    String   
+  currency  String           @default("USD")
+  status    String
   plan      SubscriptionTier
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
 }
 
 model WaitlistEntry {
-  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
   name           String
   email          String
   phone          String?
-  referralCode   String    
-  position       Int       
-  referralSource String?   
-  referredBy     String?   @db.ObjectId 
-  customData     Json?     
-  status         String    @default("active") 
-  waitlistId     String    @db.ObjectId
-  waitlist       Waitlist  @relation(fields: [waitlistId], references: [id])
-  metadata       Json?     
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  referralCode   String
+  position       Int
+  referralSource String?
+  referredBy     String?  @db.ObjectId
+  customData     Json?
+  status         String   @default("active")
+  waitlistId     String   @db.ObjectId
+  waitlist       Waitlist @relation(fields: [waitlistId], references: [id])
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@unique([email, waitlistId])
   @@unique([referralCode])
@@ -212,14 +213,14 @@ model WaitlistEntry {
 
 model Analytics {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  waitlistId  String   @db.ObjectId @unique
+  waitlistId  String   @unique @db.ObjectId
   waitlist    Waitlist @relation(fields: [waitlistId], references: [id])
   views       Int      @default(0)
   signups     Int      @default(0)
   conversions Int      @default(0)
   referrals   Int      @default(0)
-  dailyStats  Json?    
-  utmData     Json?    
+  dailyStats  Json?
+  utmData     Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -228,9 +229,23 @@ model Template {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String?
-  thumbnail   String?  
-  config      Json     
+  thumbnail   String?
+  config      Json
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model WaitlistSignups {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  waitlistId String   @db.ObjectId
+  waitlist   Waitlist @relation(fields: [waitlistId], references: [id])
+  email      String
+  name       String?
+  status     String   @default("verified")
+  referrals  Int      @default(0)
+  position   Int      @default(1)
+  joinedAt   DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

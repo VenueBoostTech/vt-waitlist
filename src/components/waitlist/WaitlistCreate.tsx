@@ -18,6 +18,26 @@ interface FormData {
   spots_referral: number;
   email_signups: boolean;
   verify_email: boolean;
+  content: {
+    title: string;
+    subtitle: string;
+    form: {
+      title: string;
+      subtitle: string;
+      fields: {
+        type: string;
+        label: string;
+        placeholder: string;
+        required: boolean;
+      }[];
+      submitButton: {
+        text: string;
+        style: {
+          backgroundColor: string;
+        };
+      };
+    };
+  };
 }
 
 const validateSubdomain = (subdomain: string) => {
@@ -42,6 +62,34 @@ export default function WaitlistCreate() {
     spots_referral: 0,
     email_signups: false,
     verify_email: false,
+    content: {
+      title: "Join Our Waitlist",
+      subtitle: "Be the first to know when we launch",
+      form: {
+        title: "Sign Up Now",
+        subtitle: "Enter your details to join the waitlist",
+        fields: [
+          {
+            type: "text",
+            label: "Full Name",
+            placeholder: "Enter your name",
+            required: true,
+          },
+          {
+            type: "email",
+            label: "Email",
+            placeholder: "Enter your email",
+            required: true,
+          },
+        ],
+        submitButton: {
+          text: "Join Waitlist",
+          style: {
+            backgroundColor: "#a47764",
+          },
+        },
+      },
+    },
   });
 
   const handleSubdomainChange = (value: string) => {
