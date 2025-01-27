@@ -1,51 +1,100 @@
-import { Copy, LinkIcon, Users2, MoreVertical, Mail, CheckCircle, XCircle } from "lucide-react";
-import React from "react";
+import { useToast } from "@/hooks/useToast";
+import {
+  Copy,
+  LinkIcon,
+  Users2,
+  MoreVertical,
+  Mail,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { ToastContainer } from "../ui/toast";
+
+interface Signup {
+  id: string;
+  name: string;
+  email: string;
+  position: number;
+  joinedAt: string;
+  status: string;
+  referralCount: number;
+}
 
 // Mock data with more test signups
-const mockSignups = [
-  {
-    id: 1,
-    name: "John Smith",
-    email: "john.smith@gmail.com",
-    position: 1,
-    joinedAt: "2024-03-20",
-    status: "verified",
-    referralCount: 5
-  },
-  {
-    id: 2,
-    name: "Sarah Johnson",
-    email: "sarah.j@outlook.com",
-    position: 2,
-    joinedAt: "2024-03-19",
-    status: "pending",
-    referralCount: 3
-  },
-  {
-    id: 3,
-    name: "Michael Brown",
-    email: "mike.brown@yahoo.com",
-    position: 3,
-    joinedAt: "2024-03-18",
-    status: "verified",
-    referralCount: 2
-  },
-  {
-    id: 4,
-    name: "Emma Wilson",
-    email: "emma.w@gmail.com",
-    position: 4,
-    joinedAt: "2024-03-17",
-    status: "verified",
-    referralCount: 0
-  }
-];
+// const mockSignups = [
+//   {
+//     id: 1,
+//     name: "John Smith",
+//     email: "john.smith@gmail.com",
+//     position: 1,
+//     joinedAt: "2024-03-20",
+//     status: "verified",
+//     referralCount: 5,
+//   },
+//   {
+//     id: 2,
+//     name: "Sarah Johnson",
+//     email: "sarah.j@outlook.com",
+//     position: 2,
+//     joinedAt: "2024-03-19",
+//     status: "pending",
+//     referralCount: 3,
+//   },
+//   {
+//     id: 3,
+//     name: "Michael Brown",
+//     email: "mike.brown@yahoo.com",
+//     position: 3,
+//     joinedAt: "2024-03-18",
+//     status: "verified",
+//     referralCount: 2,
+//   },
+//   {
+//     id: 4,
+//     name: "Emma Wilson",
+//     email: "emma.w@gmail.com",
+//     position: 4,
+//     joinedAt: "2024-03-17",
+//     status: "verified",
+//     referralCount: 0,
+//   },
+// ];
 
 const AllSignups = ({ waitlist }: any) => {
+  const [signups, setSignups] = useState<Signup[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toasts, addToast, removeToast } = useToast();
   if (!waitlist) return null;
 
   const waitlistUrl = `https://${waitlist.subdomain}.waitlist.omnistackhub.xyz`;
-  const hasSignups = mockSignups.length > 0;
+  const hasSignups = signups.length > 0;
+
+  const fetchSignups = async () => {
+    try {
+      const response = await fetch(
+        `/api/waitlist/${waitlist.id}/waitlist-signups`
+      );
+      if (!response.ok) throw new Error("Failed to fetch signups");
+      const data = await response.json();
+      setSignups(data);
+    } catch (error) {
+      addToast({
+        type: "error",
+        message: "Failed to load signups",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSignups();
+  }, []);
+
+  if (loading) {
+    return <div className="p-6">Loading...</div>;
+  }
 
   if (!hasSignups) {
     return (
@@ -64,7 +113,9 @@ const AllSignups = ({ waitlist }: any) => {
         <div className="flex items-center space-x-2 max-w-md w-full">
           <div className="flex-1 flex items-center space-x-2 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg">
             <LinkIcon className="w-4 h-4 text-gray-400" />
-            <span className="text-sm text-gray-600 truncate">{waitlistUrl}</span>
+            <span className="text-sm text-gray-600 truncate">
+              {waitlistUrl}
+            </span>
           </div>
           <button
             onClick={() => navigator.clipboard.writeText(waitlistUrl)}
@@ -85,37 +136,63 @@ const AllSignups = ({ waitlist }: any) => {
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">Position</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Referrals</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">
+                  Position
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Email
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Referrals
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Joined
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {mockSignups.map((user) => (
+              {signups.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{user.position}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    #{user.position}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {user.name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {user.email}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                      user.status === 'verified' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {user.status === 'verified' ? (
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        user.status === "verified"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
+                      {user.status === "verified" ? (
                         <CheckCircle className="w-3 h-3 mr-1" />
                       ) : (
                         <Mail className="w-3 h-3 mr-1" />
                       )}
-                      {user.status === 'verified' ? 'Verified' : 'Pending'}
+                      {user.status === "verified" ? "Verified" : "Pending"}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.referralCount}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.joinedAt}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {user.referralCount}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {user.joinedAt}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                     <button className="text-gray-400 hover:text-gray-600">
                       <MoreVertical className="w-4 h-4" />
@@ -127,6 +204,7 @@ const AllSignups = ({ waitlist }: any) => {
           </table>
         </div>
       </div>
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 };
